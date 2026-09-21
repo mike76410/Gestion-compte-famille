@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Gestion compte famille</title>
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -23,24 +21,29 @@
             color: #222;
         }
 
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
         /* =========================
            CONNEXION
         ========================= */
 
         #pageConnexion {
-            min-height: 100vh;
+            min-height: calc(100vh - 40px);
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
         }
 
         .connexion-card {
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             background: white;
-            border-radius: 18px;
+            border-radius: 14px;
             padding: 30px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.10);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
         }
 
         .connexion-card h1 {
@@ -61,30 +64,27 @@
 
         .champ-connexion label {
             display: block;
-            margin-bottom: 7px;
             font-weight: bold;
-            font-size: 14px;
+            margin-bottom: 7px;
         }
 
         .champ-connexion input {
             width: 100%;
-            padding: 13px;
+            padding: 11px;
             border: 1px solid #ccc;
-            border-radius: 9px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 15px;
         }
 
         .btn-connexion {
             width: 100%;
-            padding: 13px;
-            border: none;
-            border-radius: 9px;
+            padding: 12px;
             background: #222;
             color: white;
-            font-size: 16px;
-            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
             cursor: pointer;
-            margin-top: 5px;
         }
 
         .btn-connexion:hover {
@@ -97,10 +97,10 @@
         }
 
         #messageConnexion {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
             display: none;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
             font-size: 14px;
         }
 
@@ -108,12 +108,6 @@
             display: block;
             background: #ffe5e5;
             color: #b00020;
-        }
-
-        #messageConnexion.succes {
-            display: block;
-            background: #e5f7e8;
-            color: #187a2f;
         }
 
         /* =========================
@@ -124,27 +118,22 @@
             display: none;
         }
 
-        .container {
-            max-width: 1100px;
-            margin: auto;
-        }
-
-        .entete-application {
+        .entete {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 15px;
             margin-bottom: 25px;
+            gap: 15px;
         }
 
-        .entete-application h1 {
+        .entete h1 {
             margin: 0;
         }
 
-        .zone-utilisateur {
+        .zone-compte {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .email-utilisateur {
@@ -153,13 +142,12 @@
         }
 
         .btn-deconnexion {
+            background: #e74c3c;
+            color: white;
             border: none;
             border-radius: 8px;
             padding: 10px 14px;
-            background: #e74c3c;
-            color: white;
             cursor: pointer;
-            font-size: 14px;
         }
 
         .btn-deconnexion:hover {
@@ -187,7 +175,7 @@
 
         .ligne {
             display: grid;
-            grid-template-columns: 1fr 140px 45px;
+            grid-template-columns: 1fr 120px 42px;
             gap: 10px;
             margin-bottom: 10px;
             align-items: center;
@@ -195,7 +183,7 @@
 
         .ligne-consommable {
             display: grid;
-            grid-template-columns: 190px 1fr 140px 45px;
+            grid-template-columns: 190px 1fr 120px 42px;
             gap: 10px;
             margin-bottom: 10px;
             align-items: center;
@@ -248,6 +236,10 @@
             margin-bottom: 12px;
         }
 
+        /* =========================
+           RESUME
+        ========================= */
+
         .resume {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -272,6 +264,10 @@
         .resume-box strong {
             font-size: 22px;
         }
+
+        /* =========================
+           GRAPHIQUE
+        ========================= */
 
         .graphique-wrapper {
             display: flex;
@@ -320,6 +316,10 @@
             color: #777;
         }
 
+        /* =========================
+           LEGENDE
+        ========================= */
+
         .legende {
             margin-top: 20px;
         }
@@ -346,6 +346,10 @@
             flex-shrink: 0;
         }
 
+        /* =========================
+           TABLEAUX
+        ========================= */
+
         .tableau-recap {
             width: 100%;
             border-collapse: collapse;
@@ -363,6 +367,10 @@
         .tableau-recap td:last-child {
             text-align: right;
         }
+
+        /* =========================
+           ALERTE
+        ========================= */
 
         .alerte {
             background: #ffe5e5;
@@ -395,12 +403,12 @@
                 padding: 15px;
             }
 
-            .entete-application {
+            .entete {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .zone-utilisateur {
+            .zone-compte {
                 justify-content: space-between;
             }
 
@@ -434,21 +442,16 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
-
-            .connexion-card {
-                padding: 22px;
-            }
         }
-
     </style>
 </head>
 
 <body>
 
 
-<!-- =========================================================
-     PAGE DE CONNEXION
-========================================================= -->
+<!-- =====================================================
+     CONNEXION
+===================================================== -->
 
 <div id="pageConnexion">
 
@@ -459,7 +462,6 @@
         <div class="connexion-sous-titre">
             Connexion
         </div>
-
 
         <form id="formConnexion">
 
@@ -516,25 +518,23 @@
 
 
 
-<!-- =========================================================
+<!-- =====================================================
      APPLICATION
-========================================================= -->
+===================================================== -->
 
 <div id="application">
 
     <div class="container">
 
-
         <!-- EN-TETE -->
 
-        <div class="entete-application">
+        <div class="entete">
 
             <h1>
                 Gestion compte famille
             </h1>
 
-
-            <div class="zone-utilisateur">
+            <div class="zone-compte">
 
                 <span
                     class="email-utilisateur"
@@ -553,7 +553,6 @@
         </div>
 
 
-
         <!-- =================================================
              REVENUS
         ================================================== -->
@@ -568,9 +567,7 @@
 
             </div>
 
-
             <div id="revenus"></div>
-
 
             <div class="total">
 
@@ -582,7 +579,6 @@
             </div>
 
         </div>
-
 
 
         <!-- =================================================
@@ -606,9 +602,7 @@
 
             </div>
 
-
             <div id="charges"></div>
-
 
             <div class="total">
 
@@ -620,7 +614,6 @@
             </div>
 
         </div>
-
 
 
         <!-- =================================================
@@ -644,9 +637,7 @@
 
             </div>
 
-
             <div id="abonnements"></div>
-
 
             <div class="total">
 
@@ -658,7 +649,6 @@
             </div>
 
         </div>
-
 
 
         <!-- =================================================
@@ -682,9 +672,7 @@
 
             </div>
 
-
             <div id="consommables"></div>
-
 
             <div class="total">
 
@@ -723,13 +711,11 @@
 
                 </thead>
 
-
                 <tbody id="recapConsommables"></tbody>
 
             </table>
 
         </div>
-
 
 
         <!-- =================================================
@@ -753,9 +739,7 @@
 
             </div>
 
-
             <div id="autresDepenses"></div>
-
 
             <div class="total">
 
@@ -794,7 +778,6 @@
 
                 </thead>
 
-
                 <tbody id="recapAutresDepenses"></tbody>
 
             </table>
@@ -802,9 +785,8 @@
         </div>
 
 
-
         <!-- =================================================
-             EPARGNES
+             EPARGNES FIXES
         ================================================== -->
 
         <div class="card">
@@ -824,9 +806,7 @@
 
             </div>
 
-
             <div id="epargnes"></div>
-
 
             <div class="total">
 
@@ -838,7 +818,6 @@
             </div>
 
         </div>
-
 
 
         <!-- =================================================
@@ -853,7 +832,6 @@
 
 
             <div class="resume">
-
 
                 <div class="resume-box">
 
@@ -893,9 +871,7 @@
 
                 </div>
 
-
             </div>
-
 
 
             <div class="graphique-wrapper">
@@ -932,7 +908,6 @@
 
         </div>
 
-
     </div>
 
 </div>
@@ -942,7 +917,7 @@
 <script>
 
 /* =========================================================
-   CONFIGURATION SUPABASE
+   SUPABASE
 ========================================================= */
 
 const SUPABASE_URL =
@@ -951,7 +926,6 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_hEpQtpSMq_lCS-TjdefpFQ_kSg9ttZ4";
 
-
 const clientSupabase =
     window.supabase.createClient(
         SUPABASE_URL,
@@ -959,9 +933,8 @@ const clientSupabase =
     );
 
 
-
 /* =========================================================
-   CONNEXION
+   ELEMENTS CONNEXION
 ========================================================= */
 
 const formConnexion =
@@ -974,21 +947,20 @@ const messageConnexion =
     document.getElementById("messageConnexion");
 
 
+/* =========================================================
+   MESSAGES CONNEXION
+========================================================= */
 
-function afficherMessageConnexion(
-    message,
-    type = "erreur"
-) {
+function afficherErreurConnexion(message) {
 
     messageConnexion.textContent = message;
 
-    messageConnexion.className = type;
+    messageConnexion.className = "erreur";
 
 }
 
 
-
-function cacherMessageConnexion() {
+function effacerErreurConnexion() {
 
     messageConnexion.textContent = "";
 
@@ -997,21 +969,25 @@ function cacherMessageConnexion() {
 }
 
 
-
 /* =========================================================
    AFFICHER APPLICATION
 ========================================================= */
 
 function afficherApplication(session) {
 
-    document.getElementById("pageConnexion").style.display =
-        "none";
+    document.getElementById(
+        "pageConnexion"
+    ).style.display = "none";
 
-    document.getElementById("application").style.display =
-        "block";
+    document.getElementById(
+        "application"
+    ).style.display = "block";
 
 
-    if (session && session.user) {
+    if (
+        session &&
+        session.user
+    ) {
 
         document.getElementById(
             "emailUtilisateur"
@@ -1023,25 +999,25 @@ function afficherApplication(session) {
 }
 
 
-
 /* =========================================================
    AFFICHER CONNEXION
 ========================================================= */
 
 function afficherConnexion() {
 
-    document.getElementById("pageConnexion").style.display =
-        "flex";
+    document.getElementById(
+        "pageConnexion"
+    ).style.display = "flex";
 
-    document.getElementById("application").style.display =
-        "none";
+    document.getElementById(
+        "application"
+    ).style.display = "none";
 
 }
 
 
-
 /* =========================================================
-   CONNEXION UTILISATEUR
+   CONNEXION
 ========================================================= */
 
 formConnexion.addEventListener(
@@ -1050,15 +1026,19 @@ formConnexion.addEventListener(
 
         event.preventDefault();
 
-        cacherMessageConnexion();
+        effacerErreurConnexion();
 
 
         const email =
-            document.getElementById("email").value.trim();
+            document.getElementById(
+                "email"
+            ).value.trim();
 
 
         const motDePasse =
-            document.getElementById("motDePasse").value;
+            document.getElementById(
+                "motDePasse"
+            ).value;
 
 
         boutonConnexion.disabled = true;
@@ -1067,7 +1047,10 @@ formConnexion.addEventListener(
             "Connexion...";
 
 
-        const { data, error } =
+        const {
+            data,
+            error
+        } =
             await clientSupabase.auth.signInWithPassword({
 
                 email: email,
@@ -1079,7 +1062,7 @@ formConnexion.addEventListener(
 
         if (error) {
 
-            afficherMessageConnexion(
+            afficherErreurConnexion(
                 "Email ou mot de passe incorrect."
             );
 
@@ -1095,7 +1078,9 @@ formConnexion.addEventListener(
 
         if (data.session) {
 
-            afficherApplication(data.session);
+            afficherApplication(
+                data.session
+            );
 
         }
 
@@ -1109,7 +1094,6 @@ formConnexion.addEventListener(
 );
 
 
-
 /* =========================================================
    DECONNEXION
 ========================================================= */
@@ -1120,18 +1104,19 @@ async function seDeconnecter() {
 
     afficherConnexion();
 
-    document.getElementById("email").value = "";
+    document.getElementById(
+        "email"
+    ).value = "";
 
-    document.getElementById("motDePasse").value = "";
-
-    cacherMessageConnexion();
+    document.getElementById(
+        "motDePasse"
+    ).value = "";
 
 }
 
 
-
 /* =========================================================
-   VERIFICATION SESSION AU CHARGEMENT
+   VERIFIER SESSION
 ========================================================= */
 
 async function verifierSession() {
@@ -1140,12 +1125,15 @@ async function verifierSession() {
         data: {
             session
         }
-    } = await clientSupabase.auth.getSession();
+    } =
+        await clientSupabase.auth.getSession();
 
 
     if (session) {
 
-        afficherApplication(session);
+        afficherApplication(
+            session
+        );
 
     } else {
 
@@ -1156,9 +1144,8 @@ async function verifierSession() {
 }
 
 
-
 /* =========================================================
-   SURVEILLANCE DE LA SESSION
+   SURVEILLER LA SESSION
 ========================================================= */
 
 clientSupabase.auth.onAuthStateChange(
@@ -1166,7 +1153,9 @@ clientSupabase.auth.onAuthStateChange(
 
         if (session) {
 
-            afficherApplication(session);
+            afficherApplication(
+                session
+            );
 
         } else {
 
@@ -1178,9 +1167,8 @@ clientSupabase.auth.onAuthStateChange(
 );
 
 
-
 /* =========================================================
-   DONNEES DE L'APPLICATION
+   DONNEES
 ========================================================= */
 
 const donnees = {
@@ -1212,7 +1200,6 @@ const donnees = {
 };
 
 
-
 /* =========================================================
    FORMAT EURO
 ========================================================= */
@@ -1228,7 +1215,6 @@ function formatEuro(montant) {
     ) + " €";
 
 }
-
 
 
 /* =========================================================
@@ -1247,7 +1233,6 @@ function escapeHtml(texte) {
 }
 
 
-
 /* =========================================================
    AFFICHER LIGNES CLASSIQUES
 ========================================================= */
@@ -1255,13 +1240,17 @@ function escapeHtml(texte) {
 function afficherLignes(categorie) {
 
     const conteneur =
-        document.getElementById(categorie);
+        document.getElementById(
+            categorie
+        );
 
     const lignes =
         donnees[categorie];
 
 
-    if (lignes.length === 0) {
+    if (
+        lignes.length === 0
+    ) {
 
         conteneur.innerHTML =
             '<div class="vide">Aucune ligne ajoutée.</div>';
@@ -1272,6 +1261,7 @@ function afficherLignes(categorie) {
 
 
     conteneur.innerHTML =
+
         lignes.map(
             (ligne, index) => {
 
@@ -1281,7 +1271,9 @@ function afficherLignes(categorie) {
 
                         <input
                             type="text"
-                            value="${escapeHtml(ligne.nom)}"
+                            value="${escapeHtml(
+                                ligne.nom
+                            )}"
                             placeholder="Nom"
                             onchange="
                                 modifierNom(
@@ -1329,7 +1321,6 @@ function afficherLignes(categorie) {
 }
 
 
-
 /* =========================================================
    AFFICHER CONSOMMABLES
 ========================================================= */
@@ -1337,10 +1328,14 @@ function afficherLignes(categorie) {
 function afficherConsommables() {
 
     const conteneur =
-        document.getElementById("consommables");
+        document.getElementById(
+            "consommables"
+        );
 
 
-    if (donnees.consommables.length === 0) {
+    if (
+        donnees.consommables.length === 0
+    ) {
 
         conteneur.innerHTML =
             '<div class="vide">Aucune ligne ajoutée.</div>';
@@ -1351,6 +1346,7 @@ function afficherConsommables() {
 
 
     conteneur.innerHTML =
+
         donnees.consommables.map(
             (ligne, index) => {
 
@@ -1484,7 +1480,6 @@ function afficherConsommables() {
 }
 
 
-
 /* =========================================================
    AJOUTER LIGNE
 ========================================================= */
@@ -1500,12 +1495,13 @@ function ajouterLigne(categorie) {
     });
 
 
-    afficherLignes(categorie);
+    afficherLignes(
+        categorie
+    );
 
     mettreAJour();
 
 }
-
 
 
 /* =========================================================
@@ -1532,7 +1528,6 @@ function ajouterConsommable() {
 }
 
 
-
 /* =========================================================
    MODIFIER NOM
 ========================================================= */
@@ -1551,7 +1546,6 @@ function modifierNom(
 }
 
 
-
 function modifierNomConsommable(
     index,
     valeur
@@ -1563,7 +1557,6 @@ function modifierNomConsommable(
     mettreAJour();
 
 }
-
 
 
 /* =========================================================
@@ -1584,7 +1577,6 @@ function modifierMontant(
 }
 
 
-
 function modifierMontantConsommable(
     index,
     valeur
@@ -1598,7 +1590,6 @@ function modifierMontantConsommable(
 }
 
 
-
 /* =========================================================
    CHANGER TYPE CONSOMMABLE
 ========================================================= */
@@ -1608,7 +1599,9 @@ function changerTypeConsommable(
     valeur
 ) {
 
-    if (valeur === "manuel") {
+    if (
+        valeur === "manuel"
+    ) {
 
         donnees.consommables[index].type =
             "manuel";
@@ -1634,7 +1627,6 @@ function changerTypeConsommable(
 }
 
 
-
 /* =========================================================
    SUPPRESSION
 ========================================================= */
@@ -1649,15 +1641,18 @@ function supprimerLigne(
         1
     );
 
-    afficherLignes(categorie);
+    afficherLignes(
+        categorie
+    );
 
     mettreAJour();
 
 }
 
 
-
-function supprimerConsommable(index) {
+function supprimerConsommable(
+    index
+) {
 
     donnees.consommables.splice(
         index,
@@ -1671,9 +1666,8 @@ function supprimerConsommable(index) {
 }
 
 
-
 /* =========================================================
-   TOTAL CATEGORIE
+   TOTAL
 ========================================================= */
 
 function totalCategorie(categorie) {
@@ -1697,7 +1691,6 @@ function totalCategorie(categorie) {
     );
 
 }
-
 
 
 /* =========================================================
@@ -1758,15 +1751,10 @@ function mettreAJourRecapConsommables() {
             }
 
             else if (
-
                 ligne.type ===
-                "Complément course"
-
-                ||
-
+                "Complément course" ||
                 ligne.type ===
                 "manuel"
-
             ) {
 
                 autresConsommables +=
@@ -1812,17 +1800,11 @@ function mettreAJourRecapConsommables() {
 
                 const pourcentage =
                     total > 0
-
-                    ?
-
-                    (
+                    ? (
                         ligne.montant /
                         total
                     ) * 100
-
-                    :
-
-                    0;
+                    : 0;
 
 
                 return `
@@ -1877,7 +1859,6 @@ function mettreAJourRecapConsommables() {
 }
 
 
-
 /* =========================================================
    RECAP AUTRES DEPENSES
 ========================================================= */
@@ -1930,17 +1911,11 @@ function mettreAJourRecapAutresDepenses() {
 
                 const pourcentage =
                     total > 0
-
-                    ?
-
-                    (
+                    ? (
                         montant /
                         total
                     ) * 100
-
-                    :
-
-                    0;
+                    : 0;
 
 
                 return `
@@ -1974,7 +1949,6 @@ function mettreAJourRecapAutresDepenses() {
 }
 
 
-
 /* =========================================================
    GRAPHIQUE
 ========================================================= */
@@ -1986,30 +1960,20 @@ function mettreAJourGraphique() {
             "revenus"
         );
 
-
     const charges =
         totalCategorie(
             "charges"
         );
-
 
     const abonnements =
         totalCategorie(
             "abonnements"
         );
 
-
-    const consommables =
-        totalCategorie(
-            "consommables"
-        );
-
-
     const autresDepenses =
         totalCategorie(
             "autresDepenses"
         );
-
 
     const epargnes =
         totalCategorie(
@@ -2034,15 +1998,8 @@ function mettreAJourGraphique() {
 
 
             if (
-
-                ligne.type ===
-                "Carburant A"
-
-                ||
-
-                ligne.type ===
-                "Carburant B"
-
+                ligne.type === "Carburant A" ||
+                ligne.type === "Carburant B"
             ) {
 
                 carburant += montant;
@@ -2050,10 +2007,8 @@ function mettreAJourGraphique() {
             }
 
             else if (
-
                 ligne.type ===
                 "Course de la semaine"
-
             ) {
 
                 courseSemaine += montant;
@@ -2061,15 +2016,9 @@ function mettreAJourGraphique() {
             }
 
             else if (
-
                 ligne.type ===
-                "Complément course"
-
-                ||
-
-                ligne.type ===
-                "manuel"
-
+                "Complément course" ||
+                ligne.type === "manuel"
             ) {
 
                 autresConsommables +=
@@ -2084,17 +2033,11 @@ function mettreAJourGraphique() {
     const totalDepenses =
 
         charges +
-
         abonnements +
-
         carburant +
-
         courseSemaine +
-
         autresConsommables +
-
         autresDepenses +
-
         epargnes;
 
 
@@ -2154,19 +2097,12 @@ function mettreAJourGraphique() {
     const couleurs = [
 
         "#4e79a7",
-
         "#f28e2b",
-
         "#e15759",
-
         "#76b7b2",
-
         "#59a14f",
-
         "#edc949",
-
         "#af7aa1",
-
         "#bab0ab"
 
     ];
@@ -2178,14 +2114,14 @@ function mettreAJourGraphique() {
         );
 
 
-    if (revenus <= 0) {
+    if (
+        revenus <= 0
+    ) {
 
         graphique.style.background =
             "#ddd";
 
-    }
-
-    else {
+    } else {
 
         let debut = 0;
 
@@ -2212,9 +2148,7 @@ function mettreAJourGraphique() {
 
 
                     segments.push(
-
                         `${couleurs[index]} ${debut}% ${fin}%`
-
                     );
 
 
@@ -2227,7 +2161,6 @@ function mettreAJourGraphique() {
 
 
         graphique.style.background =
-
             `conic-gradient(
                 ${segments.join(", ")}
             )`;
@@ -2246,12 +2179,10 @@ function mettreAJourGraphique() {
     ).innerHTML =
 
         categories
-
             .filter(
                 categorie =>
                     categorie.montant > 0
             )
-
             .map(
                 categorie => {
 
@@ -2263,17 +2194,11 @@ function mettreAJourGraphique() {
 
                     const pourcentage =
                         revenus > 0
-
-                        ?
-
-                        (
+                        ? (
                             categorie.montant /
                             revenus
                         ) * 100
-
-                        :
-
-                        0;
+                        : 0;
 
 
                     return `
@@ -2297,15 +2222,11 @@ function mettreAJourGraphique() {
                             </div>
 
                             <strong>
-
                                 ${formatEuro(
                                     categorie.montant
                                 )}
-
                                 —
-
                                 ${pourcentage.toFixed(1)} %
-
                             </strong>
 
                         </div>
@@ -2314,11 +2235,9 @@ function mettreAJourGraphique() {
 
                 }
             )
-
             .join("");
 
 }
-
 
 
 /* =========================================================
@@ -2332,30 +2251,25 @@ function mettreAJour() {
             "revenus"
         );
 
-
     const charges =
         totalCategorie(
             "charges"
         );
-
 
     const abonnements =
         totalCategorie(
             "abonnements"
         );
 
-
     const consommables =
         totalCategorie(
             "consommables"
         );
 
-
     const autresDepenses =
         totalCategorie(
             "autresDepenses"
         );
-
 
     const epargnes =
         totalCategorie(
@@ -2366,13 +2280,9 @@ function mettreAJour() {
     const totalDepenses =
 
         charges +
-
         abonnements +
-
         consommables +
-
         autresDepenses +
-
         epargnes;
 
 
@@ -2441,19 +2351,10 @@ function mettreAJour() {
         );
 
 
-    if (reste < 0) {
-
-        elementReste.style.color =
-            "#e74c3c";
-
-    }
-
-    else {
-
-        elementReste.style.color =
-            "#222";
-
-    }
+    elementReste.style.color =
+        reste < 0
+            ? "#e74c3c"
+            : "#222";
 
 
     const alerte =
@@ -2462,7 +2363,9 @@ function mettreAJour() {
         );
 
 
-    if (reste < 0) {
+    if (
+        reste < 0
+    ) {
 
         alerte.innerHTML = `
 
@@ -2478,9 +2381,7 @@ function mettreAJour() {
 
         `;
 
-    }
-
-    else {
+    } else {
 
         alerte.innerHTML = "";
 
@@ -2496,9 +2397,8 @@ function mettreAJour() {
 }
 
 
-
 /* =========================================================
-   INITIALISATION DE L'APPLICATION
+   INITIALISATION
 ========================================================= */
 
 afficherLignes("revenus");
@@ -2514,11 +2414,6 @@ afficherLignes("autresDepenses");
 afficherLignes("epargnes");
 
 mettreAJour();
-
-
-/* =========================================================
-   VERIFICATION INITIALE DE LA SESSION
-========================================================= */
 
 verifierSession();
 
