@@ -221,10 +221,8 @@ select:focus {
     border-top: 1px solid #dfe3e8;
     margin-top: 15px;
     padding-top: 14px;
-
     display: flex;
     justify-content: space-between;
-
     font-size: 16px;
     font-weight: 700;
 }
@@ -527,13 +525,8 @@ select:focus {
     .legend-row {
         gap: 10px;
     }
-
 }
 
-
-/* =========================================================
-   TRES PETIT ECRAN
-========================================================= */
 
 @media (max-width: 430px) {
 
@@ -568,7 +561,7 @@ select:focus {
 
 
 <!-- =====================================================
-     PAGE LOGIN
+     LOGIN
 ===================================================== -->
 
 <div id="loginPage">
@@ -600,7 +593,6 @@ select:focus {
 
             </div>
 
-
             <div class="login-field">
 
                 <label for="loginPassword">
@@ -616,7 +608,6 @@ select:focus {
 
             </div>
 
-
             <button
                 class="login-button"
                 id="loginButton"
@@ -626,7 +617,6 @@ select:focus {
             </button>
 
         </form>
-
 
         <div
             class="login-error"
@@ -645,13 +635,11 @@ select:focus {
 
 <div id="app">
 
-
     <header class="header">
 
         <div class="header-title">
             💰 Gestion compte famille
         </div>
-
 
         <div class="account-zone">
 
@@ -690,9 +678,7 @@ select:focus {
 
             </div>
 
-
             <div id="revenus"></div>
-
 
             <button
                 class="add-button"
@@ -700,7 +686,6 @@ select:focus {
             >
                 + Ajouter une ligne
             </button>
-
 
             <div class="total">
 
@@ -735,9 +720,7 @@ select:focus {
 
             </div>
 
-
             <div id="charges"></div>
-
 
             <button
                 class="add-button"
@@ -745,7 +728,6 @@ select:focus {
             >
                 + Ajouter une ligne
             </button>
-
 
             <div class="total">
 
@@ -780,9 +762,7 @@ select:focus {
 
             </div>
 
-
             <div id="abonnements"></div>
-
 
             <button
                 class="add-button"
@@ -790,7 +770,6 @@ select:focus {
             >
                 + Ajouter une ligne
             </button>
-
 
             <div class="total">
 
@@ -825,9 +804,7 @@ select:focus {
 
             </div>
 
-
             <div id="consommables"></div>
-
 
             <button
                 class="add-button"
@@ -835,7 +812,6 @@ select:focus {
             >
                 + Ajouter une ligne
             </button>
-
 
             <div class="total">
 
@@ -852,11 +828,153 @@ select:focus {
 
             </div>
 
+        </section>
 
-            <h3>
-                Répartition des consommables
-            </h3>
 
+
+        <!-- =================================================
+             AUTRES DEPENSES
+        ================================================== -->
+
+        <section class="card">
+
+            <div class="card-title">
+
+                <h2>
+                    💳 Autres dépenses
+                </h2>
+
+            </div>
+
+            <div id="autresDepenses"></div>
+
+            <button
+                class="add-button"
+                onclick="addLine('autresDepenses')"
+            >
+                + Ajouter une ligne
+            </button>
+
+            <div class="total">
+
+                <span>
+                    Total
+                </span>
+
+                <span
+                    class="total-value"
+                    id="totalAutresDepenses"
+                >
+                    0,00 €
+                </span>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             EPARGNES
+        ================================================== -->
+
+        <section class="card">
+
+            <div class="card-title">
+
+                <h2>
+                    🏦 Épargnes fixes
+                </h2>
+
+            </div>
+
+            <div id="epargnes"></div>
+
+            <button
+                class="add-button"
+                onclick="addLine('epargnes')"
+            >
+                + Ajouter une ligne
+            </button>
+
+            <div class="total">
+
+                <span>
+                    Total
+                </span>
+
+                <span
+                    class="total-value"
+                    id="totalEpargnes"
+                >
+                    0,00 €
+                </span>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             REPARTITION DU BUDGET
+        ================================================== -->
+
+        <section class="chart-card">
+
+            <h2>
+                📊 Répartition du budget
+            </h2>
+
+            <div class="chart-area">
+
+                <div
+                    class="donut"
+                    id="donut"
+                >
+
+                    <div class="donut-center">
+
+                        <strong
+                            id="donutAmount"
+                        >
+                            0,00 €
+                        </strong>
+
+                        <span>
+                            Revenus
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div
+                class="legend"
+                id="legend"
+            ></div>
+
+            <div id="alert"></div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             REPARTITION CONSOMMABLES
+        ================================================== -->
+
+        <section class="card">
+
+            <div class="card-title">
+
+                <h2>
+                    🛒 Répartition des consommables
+                </h2>
+
+            </div>
 
             <table class="recap-table">
 
@@ -891,7 +1009,7 @@ select:focus {
 
 
         <!-- =================================================
-             AUTRES DEPENSES
+             REPARTITION AUTRES DEPENSES
         ================================================== -->
 
         <section class="card">
@@ -899,43 +1017,10 @@ select:focus {
             <div class="card-title">
 
                 <h2>
-                    💳 Autres dépenses
+                    💳 Répartition des autres dépenses
                 </h2>
 
             </div>
-
-
-            <div id="autresDepenses"></div>
-
-
-            <button
-                class="add-button"
-                onclick="addLine('autresDepenses')"
-            >
-                + Ajouter une ligne
-            </button>
-
-
-            <div class="total">
-
-                <span>
-                    Total
-                </span>
-
-                <span
-                    class="total-value"
-                    id="totalAutresDepenses"
-                >
-                    0,00 €
-                </span>
-
-            </div>
-
-
-            <h3>
-                Répartition des autres dépenses
-            </h3>
-
 
             <table class="recap-table">
 
@@ -968,100 +1053,6 @@ select:focus {
         </section>
 
 
-
-        <!-- =================================================
-             EPARGNES
-        ================================================== -->
-
-        <section class="card">
-
-            <div class="card-title">
-
-                <h2>
-                    🏦 Épargnes fixes
-                </h2>
-
-            </div>
-
-
-            <div id="epargnes"></div>
-
-
-            <button
-                class="add-button"
-                onclick="addLine('epargnes')"
-            >
-                + Ajouter une ligne
-            </button>
-
-
-            <div class="total">
-
-                <span>
-                    Total
-                </span>
-
-                <span
-                    class="total-value"
-                    id="totalEpargnes"
-                >
-                    0,00 €
-                </span>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             GRAPHIQUE
-        ================================================== -->
-
-        <section class="chart-card">
-
-            <h2>
-                📊 Répartition du budget
-            </h2>
-
-
-            <div class="chart-area">
-
-                <div
-                    class="donut"
-                    id="donut"
-                >
-
-                    <div class="donut-center">
-
-                        <strong
-                            id="donutAmount"
-                        >
-                            0,00 €
-                        </strong>
-
-                        <span>
-                            Revenus
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div
-                class="legend"
-                id="legend"
-            ></div>
-
-
-            <div id="alert"></div>
-
-        </section>
-
-
     </main>
 
 </div>
@@ -1079,7 +1070,6 @@ const SUPABASE_URL =
 
 const SUPABASE_KEY =
     "sb_publishable_hEpQtpSMq_lCS-TjdefpFQ_kSg9ttZ4";
-
 
 const supabaseClient =
     window.supabase.createClient(
@@ -1152,7 +1142,7 @@ function safe(value) {
 
 
 /* =========================================================
-   TOTAL CATEGORIE
+   TOTAL
 ========================================================= */
 
 function total(category) {
@@ -1167,7 +1157,7 @@ function total(category) {
 
 
 /* =========================================================
-   AFFICHER LIGNES
+   AFFICHAGE LIGNES
 ========================================================= */
 
 function renderLines(category) {
@@ -1205,7 +1195,6 @@ function renderLines(category) {
                         "
                     >
 
-
                     <input
                         type="number"
                         min="0"
@@ -1218,7 +1207,6 @@ function renderLines(category) {
                             update();
                         "
                     >
-
 
                     <button
                         class="delete-button"
@@ -1241,7 +1229,7 @@ function renderLines(category) {
 
 
 /* =========================================================
-   AFFICHER CONSOMMABLES
+   AFFICHAGE CONSOMMABLES
 ========================================================= */
 
 function renderConsumables() {
@@ -1335,17 +1323,13 @@ function renderConsumables() {
 
                         ${
                             manual
-
                             ?
-
                             `
                                 <input
                                     class="manual-name"
                                     type="text"
                                     placeholder="Nom"
-                                    value="${safe(
-                                        line.nom
-                                    )}"
+                                    value="${safe(line.nom)}"
                                     oninput="
                                         data.consommables[
                                             ${index}
@@ -1354,9 +1338,7 @@ function renderConsumables() {
                                     "
                                 >
                             `
-
                             :
-
                             `<div></div>`
                         }
 
@@ -1400,7 +1382,7 @@ function renderConsumables() {
 
 
 /* =========================================================
-   AJOUT LIGNE
+   AJOUT
 ========================================================= */
 
 function addLine(category) {
@@ -1413,17 +1395,12 @@ function addLine(category) {
 
     });
 
-
     renderLines(category);
 
     update();
 
 }
 
-
-/* =========================================================
-   AJOUT CONSOMMABLE
-========================================================= */
 
 function addConsumable() {
 
@@ -1436,7 +1413,6 @@ function addConsumable() {
         montant: 0
 
     });
-
 
     renderConsumables();
 
@@ -1481,7 +1457,7 @@ function deleteConsumable(index) {
 
 
 /* =========================================================
-   CHANGEMENT CONSOMMABLE
+   TYPE CONSOMMABLE
 ========================================================= */
 
 function changeConsumableType(
@@ -1534,7 +1510,6 @@ function updateConsumableRecap() {
                 carburantA += amount;
 
             }
-
             else if (
                 line.type === "Carburant B"
             ) {
@@ -1542,16 +1517,13 @@ function updateConsumableRecap() {
                 carburantB += amount;
 
             }
-
             else if (
-                line.type ===
-                "Course de la semaine"
+                line.type === "Course de la semaine"
             ) {
 
                 course += amount;
 
             }
-
             else {
 
                 autres += amount;
@@ -1644,9 +1616,7 @@ function updateConsumableRecap() {
                 </th>
 
                 <th>
-                    ${euro(
-                        totalConsumables
-                    )}
+                    ${euro(totalConsumables)}
                 </th>
 
                 <th>
@@ -1787,20 +1757,16 @@ function updateChart() {
                 carburant += amount;
 
             }
-
             else if (
-                line.type ===
-                "Course de la semaine"
+                line.type === "Course de la semaine"
             ) {
 
                 course += amount;
 
             }
-
             else {
 
-                autresConsommables +=
-                    amount;
+                autresConsommables += amount;
 
             }
 
@@ -1988,9 +1954,7 @@ function updateChart() {
                             </div>
 
                             <strong>
-                                ${euro(
-                                    category.value
-                                )}
+                                ${euro(category.value)}
                                 —
                                 ${percentage.toFixed(1)} %
                             </strong>
@@ -2007,7 +1971,7 @@ function updateChart() {
 
 
 /* =========================================================
-   MISE A JOUR
+   MISE A JOUR GENERALE
 ========================================================= */
 
 function update() {
@@ -2241,6 +2205,7 @@ async function logout() {
 
     await supabaseClient.auth.signOut();
 
+
     document.getElementById(
         "app"
     ).style.display =
@@ -2261,7 +2226,7 @@ async function logout() {
 
 
 /* =========================================================
-   SESSION EXISTANTE
+   SESSION
 ========================================================= */
 
 async function checkSession() {
@@ -2313,9 +2278,7 @@ checkSession();
 supabaseClient.auth.onAuthStateChange(
     (event, session) => {
 
-        if (
-            session
-        ) {
+        if (session) {
 
             showApp(session);
 
