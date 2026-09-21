@@ -173,6 +173,90 @@ select:focus {
 
 
 /* =========================================================
+   BUDGET PREVISIONNEL CONSOMMABLES
+========================================================= */
+
+.consumable-budget-summary {
+    padding: 12px 0;
+    border-bottom: 1px solid #eceff2;
+    margin-bottom: 10px;
+}
+
+.consumable-budget-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 14px;
+}
+
+.consumable-budget-name {
+    font-weight: 700;
+    min-width: 155px;
+}
+
+.consumable-budget-item {
+    color: #777;
+}
+
+.consumable-budget-item strong {
+    color: #111;
+}
+
+.budget-input {
+    width: 95px;
+    height: 36px;
+    border: 1px solid #ccd1d9;
+    border-radius: 8px;
+    padding: 0 9px;
+    font-size: 14px;
+    outline: none;
+}
+
+.budget-input:focus {
+    border-color: #9ca3af;
+}
+
+.consumable-budget-remaining {
+    font-weight: 700;
+}
+
+.consumable-budget-remaining.over {
+    color: #c62828;
+}
+
+.consumable-budget-warning {
+    margin-top: 5px;
+    color: #c62828;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+@media (max-width: 700px) {
+
+    .consumable-budget-line {
+        display: block;
+        line-height: 1.9;
+    }
+
+    .consumable-budget-name {
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .consumable-budget-item {
+        margin-right: 7px;
+    }
+
+    .budget-input {
+        width: 88px;
+        height: 34px;
+        margin: 0 3px;
+    }
+
+}
+
+/* =========================================================
    BOUTONS AJOUTER
 ========================================================= */
 
@@ -1122,7 +1206,14 @@ const data = {
     abonnements: [],
     consommables: [],
     autresDepenses: [],
-    epargnes: []
+    epargnes: [],
+
+    budgets: {
+        "Carburant A": null,
+        "Carburant B": null,
+        "Course de la semaine": null,
+        "Autres consommables": null
+    }
 
 };
 
@@ -1306,6 +1397,15 @@ async function chargerBudget() {
                 ? sauvegarde.epargnes
                 : [];
 
+
+            data.budgets = {
+                "Carburant A": null,
+                "Carburant B": null,
+                "Course de la semaine": null,
+                "Autres consommables": null,
+                ...(sauvegarde.budgets || {})
+            };
+
         }
 
 
@@ -1483,6 +1583,106 @@ function renderLines(category) {
    CONSOMMABLES
 ========================================================= */
 
+function getConsumableGroups() {
+
+    return [
+
+        {
+            key: "Carburant A",
+            label: "⛽ Carburant A"
+        },
+
+        {
+            key: "Carburant B",
+            label: "⛽ Carburant B"
+        },
+
+        {
+            key: "Course de la semaine",
+            label: "🛒 Course de la semaine"
+        },
+
+        {
+            key: "Autres consommables",
+            label: "🛒 Autres consommables"
+        }
+
+    ];
+
+}
+
+
+function getConsumableSpent(key) {
+
+    return data.consommables.reduce(
+        (sum, line) => {
+
+            let group = line.type;
+
+            if (
+                line.type === "Complément course" ||
+                line.type === "manuel"
+            ) {
+                group = "Autres consommables";
+            }
+
+            return sum +
+                (
+                    group === key
+                    ? Number(line.montant) || 0
+                    : 0
+                );
+
+        },
+        0
+    );
+
+}
+
+
+function getConsumableBudget(key) {
+
+    const value =
+        data.budgets &&
+        data.budgets[key];
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return null;
+    }
+
+    const number = Number(value);
+
+    return Number.isFinite(number)
+        ? Math.max(number, 0)
+        : null;
+
+}
+
+
+function getConsumableReserved(key) {
+
+    const spent =
+        getConsumableSpent(key);
+
+    const budget =
+        getConsumableBudget(key);
+
+    if (budget === null) {
+        return spent;
+    }
+
+    return Math.max(
+        budget,
+        spent
+    );
+
+}
+
+
 function renderConsumables() {
 
     const container =
@@ -1491,19 +1691,78 @@ function renderConsumables() {
         );
 
 
-    if (
-        data.consommables.length === 0
-    ) {
+    const summaries =
+        getConsumableGroups()
+            .map(group => `
 
-        container.innerHTML =
-            '<div class="empty">Aucune ligne ajoutée.</div>';
+                <div class="consumable-budget-summary">
 
-        return;
+                    <div class="consumable-budget-line">
 
-    }
+                        <span class="consumable-budget-name">
+                            ${group.label}
+                        </span>
+
+                        <span class="consumable-budget-item">
+                            Budget :
+                            <input
+                                class="budget-input"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value="${
+                                    getConsumableBudget(group.key) === null
+                                    ? ""
+                                    : getConsumableBudget(group.key)
+                                }"
+                                placeholder="Budget"
+                                oninput="
+                                    setConsumableBudget(
+                                        '${group.key}',
+                                        this.value
+                                    )
+                                "
+                            >
+                        </span>
+
+                        <span class="consumable-budget-item">
+                            Dépensé :
+                            <strong id="spent-${safe(group.key)}">
+                                ${euro(getConsumableSpent(group.key))}
+                            </strong>
+                        </span>
+
+                        <span
+                            class="consumable-budget-item consumable-budget-remaining"
+                            id="remaining-${safe(group.key)}"
+                        >
+                            Reste :
+                            <strong>
+                                ${
+                                    getConsumableBudget(group.key) === null
+                                    ? "—"
+                                    : euro(
+                                        getConsumableBudget(group.key) -
+                                        getConsumableSpent(group.key)
+                                    )
+                                }
+                            </strong>
+                        </span>
+
+                    </div>
+
+                    <div
+                        class="consumable-budget-warning"
+                        id="warning-${safe(group.key)}"
+                    ></div>
+
+                </div>
+
+            `)
+            .join("");
 
 
-    container.innerHTML =
+    const expenseRows =
         data.consommables.map(
             (line, index) => {
 
@@ -1645,6 +1904,121 @@ function renderConsumables() {
             }
         ).join("");
 
+
+    container.innerHTML =
+        summaries +
+        (
+            expenseRows ||
+            '<div class="empty">Aucune dépense ajoutée.</div>'
+        );
+
+    updateConsumableBudgetSummary();
+
+}
+
+
+function setConsumableBudget(
+    key,
+    value
+) {
+
+    if (!data.budgets) {
+        data.budgets = {};
+    }
+
+    if (value === "") {
+        data.budgets[key] = null;
+    }
+    else {
+        data.budgets[key] =
+            Math.max(
+                Number(value) || 0,
+                0
+            );
+    }
+
+    update();
+    programmerSauvegarde();
+
+}
+
+
+function updateConsumableBudgetSummary() {
+
+    getConsumableGroups().forEach(
+        group => {
+
+            const spent =
+                getConsumableSpent(group.key);
+
+            const budget =
+                getConsumableBudget(group.key);
+
+            const remainingElement =
+                document.getElementById(
+                    `remaining-${group.key}`
+                );
+
+            const spentElement =
+                document.getElementById(
+                    `spent-${group.key}`
+                );
+
+            const warningElement =
+                document.getElementById(
+                    `warning-${group.key}`
+                );
+
+            if (!spentElement) {
+                return;
+            }
+
+            spentElement.textContent =
+                euro(spent);
+
+            if (budget === null) {
+
+                remainingElement.innerHTML =
+                    `Reste : <strong>—</strong>`;
+
+                remainingElement.classList.remove(
+                    "over"
+                );
+
+                warningElement.textContent = "";
+
+                return;
+            }
+
+            const remaining =
+                budget - spent;
+
+            remainingElement.innerHTML =
+                `Reste : <strong>${euro(remaining)}</strong>`;
+
+            if (remaining < 0) {
+
+                remainingElement.classList.add(
+                    "over"
+                );
+
+                warningElement.textContent =
+                    `⚠️ Budget dépassé de ${euro(Math.abs(remaining))}`;
+
+            }
+            else {
+
+                remainingElement.classList.remove(
+                    "over"
+                );
+
+                warningElement.textContent = "";
+
+            }
+
+        }
+    );
+
 }
 
 
@@ -1768,50 +2142,17 @@ function changeConsumableType(
 
 function updateConsumableRecap() {
 
-    let carburantA = 0;
-    let carburantB = 0;
-    let course = 0;
-    let autres = 0;
+    const carburantA =
+        getConsumableSpent("Carburant A");
 
+    const carburantB =
+        getConsumableSpent("Carburant B");
 
-    data.consommables.forEach(
-        line => {
+    const course =
+        getConsumableSpent("Course de la semaine");
 
-            const amount =
-                Number(line.montant) || 0;
-
-
-            if (
-                line.type === "Carburant A"
-            ) {
-
-                carburantA += amount;
-
-            }
-            else if (
-                line.type === "Carburant B"
-            ) {
-
-                carburantB += amount;
-
-            }
-            else if (
-                line.type ===
-                "Course de la semaine"
-            ) {
-
-                course += amount;
-
-            }
-            else {
-
-                autres += amount;
-
-            }
-
-        }
-    );
-
+    const autres =
+        getConsumableSpent("Autres consommables");
 
     const totalConsumables =
         carburantA +
@@ -2022,42 +2363,15 @@ function updateChart() {
         total("epargnes");
 
 
-    let carburant = 0;
-    let course = 0;
-    let autresConsommables = 0;
+    const carburant =
+        getConsumableReserved("Carburant A") +
+        getConsumableReserved("Carburant B");
 
+    const course =
+        getConsumableReserved("Course de la semaine");
 
-    data.consommables.forEach(
-        line => {
-
-            const amount =
-                Number(line.montant) || 0;
-
-
-            if (
-                line.type === "Carburant A" ||
-                line.type === "Carburant B"
-            ) {
-
-                carburant += amount;
-
-            }
-            else if (
-                line.type ===
-                "Course de la semaine"
-            ) {
-
-                course += amount;
-
-            }
-            else {
-
-                autresConsommables += amount;
-
-            }
-
-        }
-    );
+    const autresConsommables =
+        getConsumableReserved("Autres consommables");
 
 
     const expenses =
@@ -2300,6 +2614,8 @@ function update() {
         euro(total("epargnes"));
 
 
+    updateConsumableBudgetSummary();
+
     updateConsumableRecap();
 
     updateOtherExpensesRecap();
@@ -2311,10 +2627,17 @@ function update() {
         total("revenus");
 
 
+    const projectedConsumables =
+        getConsumableReserved("Carburant A") +
+        getConsumableReserved("Carburant B") +
+        getConsumableReserved("Course de la semaine") +
+        getConsumableReserved("Autres consommables");
+
+
     const expenses =
         total("charges") +
         total("abonnements") +
-        total("consommables") +
+        projectedConsumables +
         total("autresDepenses") +
         total("epargnes");
 
