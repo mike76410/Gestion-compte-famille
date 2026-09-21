@@ -1,480 +1,599 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion compte famille</title>
-
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            color: #222;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: auto;
-        }
-
-        /* =========================
-           CONNEXION
-        ========================= */
-
-        #pageConnexion {
-            min-height: calc(100vh - 40px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .connexion-card {
-            width: 100%;
-            max-width: 400px;
-            background: white;
-            border-radius: 14px;
-            padding: 30px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .connexion-card h1 {
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
-
-        .connexion-sous-titre {
-            text-align: center;
-            color: #777;
-            margin-bottom: 25px;
-        }
-
-        .champ-connexion {
-            margin-bottom: 15px;
-        }
-
-        .champ-connexion label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 7px;
-        }
-
-        .champ-connexion input {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 15px;
-        }
-
-        .btn-connexion {
-            width: 100%;
-            padding: 12px;
-            background: #222;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            cursor: pointer;
-        }
-
-        .btn-connexion:hover {
-            opacity: 0.85;
-        }
-
-        .btn-connexion:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        #messageConnexion {
-            display: none;
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        #messageConnexion.erreur {
-            display: block;
-            background: #ffe5e5;
-            color: #b00020;
-        }
-
-        /* =========================
-           APPLICATION
-        ========================= */
-
-        #application {
-            display: none;
-        }
-
-        .entete {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            gap: 15px;
-        }
-
-        .entete h1 {
-            margin: 0;
-        }
-
-        .zone-compte {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .email-utilisateur {
-            color: #777;
-            font-size: 13px;
-        }
-
-        .btn-deconnexion {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 14px;
-            cursor: pointer;
-        }
-
-        .btn-deconnexion:hover {
-            background: #c0392b;
-        }
-
-        h2 {
-            margin-top: 0;
-            font-size: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 14px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .total {
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-
-        .ligne {
-            display: grid;
-            grid-template-columns: 1fr 120px 42px;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        .ligne-consommable {
-            display: grid;
-            grid-template-columns: 190px 1fr 120px 42px;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 15px;
-            background: white;
-        }
-
-        button {
-            border: none;
-            border-radius: 8px;
-            padding: 10px 14px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .btn-ajouter {
-            margin-top: 5px;
-            background: #222;
-            color: white;
-        }
-
-        .btn-ajouter:hover {
-            opacity: 0.85;
-        }
-
-        .btn-supprimer {
-            background: #e74c3c;
-            color: white;
-            font-size: 18px;
-            width: 42px;
-            height: 42px;
-            padding: 0;
-        }
-
-        .btn-supprimer:hover {
-            background: #c0392b;
-        }
-
-        .vide {
-            color: #888;
-            font-style: italic;
-            margin-bottom: 12px;
-        }
-
-        /* =========================
-           RESUME
-        ========================= */
-
-        .resume {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .resume-box {
-            background: white;
-            border-radius: 14px;
-            padding: 18px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-        }
-
-        .resume-box span {
-            display: block;
-            color: #777;
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
-
-        .resume-box strong {
-            font-size: 22px;
-        }
-
-        /* =========================
-           GRAPHIQUE
-        ========================= */
-
-        .graphique-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 25px 0;
-        }
-
-        .graphique {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            position: relative;
-            background: #ddd;
-        }
-
-        .graphique::after {
-            content: "";
-            position: absolute;
-            width: 145px;
-            height: 145px;
-            background: white;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .graphique-centre {
-            position: absolute;
-            z-index: 2;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            width: 150px;
-        }
-
-        .graphique-centre strong {
-            display: block;
-            font-size: 20px;
-        }
-
-        .graphique-centre span {
-            font-size: 13px;
-            color: #777;
-        }
-
-        /* =========================
-           LEGENDE
-        ========================= */
-
-        .legende {
-            margin-top: 20px;
-        }
-
-        .legende-ligne {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            gap: 10px;
-        }
-
-        .legende-gauche {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .pastille {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        /* =========================
-           TABLEAUX
-        ========================= */
-
-        .tableau-recap {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        .tableau-recap th,
-        .tableau-recap td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-        }
-
-        .tableau-recap th:last-child,
-        .tableau-recap td:last-child {
-            text-align: right;
-        }
-
-        /* =========================
-           ALERTE
-        ========================= */
-
-        .alerte {
-            background: #ffe5e5;
-            color: #b00020;
-            padding: 14px;
-            border-radius: 10px;
-            margin-top: 15px;
-            font-weight: bold;
-        }
-
-        .section-titre {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        /* =========================
-           MOBILE
-        ========================= */
-
-        @media (max-width: 700px) {
-
-            body {
-                padding: 10px;
-            }
-
-            .card {
-                padding: 15px;
-            }
-
-            .entete {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .zone-compte {
-                justify-content: space-between;
-            }
-
-            .ligne {
-                grid-template-columns: 1fr 100px 42px;
-            }
-
-            .ligne-consommable {
-                grid-template-columns: 1fr 100px 42px;
-            }
-
-            .ligne-consommable select {
-                grid-column: 1 / 3;
-            }
-
-            .ligne-consommable input[type="text"] {
-                grid-column: 1 / 3;
-            }
-
-            .graphique {
-                width: 240px;
-                height: 240px;
-            }
-
-            .graphique::after {
-                width: 115px;
-                height: 115px;
-            }
-
-            .legende-ligne {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Gestion compte famille</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+/* =========================================================
+   GENERAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f1f3f7;
+    color: #111;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header {
+    height: 55px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #e5e7eb;
+    position: relative;
+}
+
+.header-title {
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.account-zone {
+    position: absolute;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.account-email {
+    font-size: 13px;
+    color: #777;
+}
+
+.logout-button {
+    border: none;
+    background: #ef4b3f;
+    color: white;
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.logout-button:hover {
+    background: #d93d32;
+}
+
+
+/* =========================================================
+   APPLICATION
+========================================================= */
+
+#app {
+    display: none;
+}
+
+.container {
+    width: min(870px, calc(100% - 30px));
+    margin: 20px auto 40px;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.card {
+    background: white;
+    border-radius: 17px;
+    padding: 20px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+}
+
+.card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-title h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   LIGNES CLASSIQUES
+========================================================= */
+
+.line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 120px 40px;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.line input {
+    height: 42px;
+    border: 1px solid #ccd1d9;
+    border-radius: 9px;
+    padding: 0 11px;
+    font-size: 15px;
+    outline: none;
+}
+
+.line input:focus,
+.manual-name:focus,
+.amount-input:focus,
+select:focus {
+    border-color: #9ca3af;
+}
+
+
+/* =========================================================
+   LIGNES CONSOMMABLES
+========================================================= */
+
+.consumable-line {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr) 120px 40px;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.consumable-line select,
+.consumable-line input {
+    height: 42px;
+    border: 1px solid #ccd1d9;
+    border-radius: 9px;
+    padding: 0 11px;
+    font-size: 15px;
+    background: white;
+    outline: none;
+}
+
+
+/* =========================================================
+   BOUTONS AJOUTER
+========================================================= */
+
+.add-button {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 9px;
+    background: #edf1ff;
+    color: #493cff;
+    font-weight: 700;
+    font-size: 15px;
+    margin-top: 3px;
+}
+
+.add-button:hover {
+    background: #e3e8ff;
+}
+
+
+/* =========================================================
+   SUPPRESSION
+========================================================= */
+
+.delete-button {
+    width: 40px;
+    height: 42px;
+    border: none;
+    border-radius: 9px;
+    background: #f0f2f4;
+    color: #68809b;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.delete-button:hover {
+    background: #e7eaed;
+}
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.total {
+    border-top: 1px solid #dfe3e8;
+    margin-top: 15px;
+    padding-top: 14px;
+
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.total-value {
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   LIGNE VIDE
+========================================================= */
+
+.empty {
+    color: #9a9a9a;
+    font-style: italic;
+    padding: 4px 0 12px;
+}
+
+
+/* =========================================================
+   RECAP
+========================================================= */
+
+.recap-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+.recap-table th,
+.recap-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid #eceff2;
+    font-size: 14px;
+}
+
+.recap-table th {
+    font-weight: 700;
+    text-align: left;
+}
+
+.recap-table th:not(:first-child),
+.recap-table td:not(:first-child) {
+    text-align: right;
+}
+
+
+/* =========================================================
+   GRAPHIQUE
+========================================================= */
+
+.chart-card {
+    background: white;
+    border-radius: 17px;
+    padding: 20px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+}
+
+.chart-card h2 {
+    margin-top: 0;
+}
+
+.chart-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.donut {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    position: relative;
+}
+
+.donut::after {
+    content: "";
+    position: absolute;
+    width: 135px;
+    height: 135px;
+    border-radius: 50%;
+    background: white;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.donut-center {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 150px;
+}
+
+.donut-center strong {
+    display: block;
+    font-size: 20px;
+}
+
+.donut-center span {
+    color: #777;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   LEGENDE
+========================================================= */
+
+.legend {
+    margin-top: 5px;
+}
+
+.legend-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid #eceff2;
+    font-size: 14px;
+}
+
+.legend-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+.alert {
+    margin-top: 15px;
+    background: #ffe5e5;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 9px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+#loginPage {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-card {
+    width: min(400px, 100%);
+    background: white;
+    border-radius: 17px;
+    padding: 30px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+.login-title {
+    text-align: center;
+    font-size: 25px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 25px;
+}
+
+.login-field {
+    margin-bottom: 15px;
+}
+
+.login-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+.login-field input {
+    width: 100%;
+    height: 44px;
+    border: 1px solid #ccd1d9;
+    border-radius: 9px;
+    padding: 0 12px;
+    font-size: 15px;
+}
+
+.login-button {
+    width: 100%;
+    height: 45px;
+    border: none;
+    border-radius: 9px;
+    background: #493cff;
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.login-button:disabled {
+    opacity: 0.6;
+}
+
+.login-error {
+    display: none;
+    margin-top: 15px;
+    background: #ffe5e5;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .header {
+        height: auto;
+        min-height: 55px;
+        padding: 10px 15px;
+    }
+
+    .header-title {
+        font-size: 21px;
+    }
+
+    .account-zone {
+        position: static;
+        display: none;
+    }
+
+    .container {
+        width: calc(100% - 20px);
+        margin-top: 12px;
+    }
+
+    .card,
+    .chart-card {
+        padding: 17px 12px;
+        border-radius: 14px;
+    }
+
+    .card-title {
+        align-items: center;
+    }
+
+    .card-title h2 {
+        font-size: 19px;
+    }
+
+    .line {
+        grid-template-columns: minmax(0, 1fr) 100px 40px;
+    }
+
+    .consumable-line {
+        grid-template-columns: minmax(0, 1fr) 100px 40px;
+    }
+
+    .consumable-line select {
+        grid-column: 1 / 3;
+    }
+
+    .consumable-line .manual-name {
+        grid-column: 1 / 3;
+    }
+
+    .donut {
+        width: 230px;
+        height: 230px;
+    }
+
+    .donut::after {
+        width: 110px;
+        height: 110px;
+    }
+
+    .legend-row {
+        gap: 10px;
+    }
+
+}
+
+
+/* =========================================================
+   TRES PETIT ECRAN
+========================================================= */
+
+@media (max-width: 430px) {
+
+    .line {
+        grid-template-columns: minmax(0, 1fr) 90px 38px;
+        gap: 5px;
+    }
+
+    .consumable-line {
+        grid-template-columns: minmax(0, 1fr) 90px 38px;
+        gap: 5px;
+    }
+
+    .line input,
+    .consumable-line input,
+    .consumable-line select {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .delete-button {
+        width: 38px;
+    }
+
+}
+
+</style>
 </head>
+
 
 <body>
 
 
 <!-- =====================================================
-     CONNEXION
+     PAGE LOGIN
 ===================================================== -->
 
-<div id="pageConnexion">
+<div id="loginPage">
 
-    <div class="connexion-card">
+    <div class="login-card">
 
-        <h1>Gestion compte famille</h1>
+        <div class="login-title">
+            💰 Gestion compte famille
+        </div>
 
-        <div class="connexion-sous-titre">
+        <div class="login-subtitle">
             Connexion
         </div>
 
-        <form id="formConnexion">
+        <form id="loginForm">
 
-            <div class="champ-connexion">
+            <div class="login-field">
 
-                <label for="email">
+                <label for="loginEmail">
                     Email
                 </label>
 
                 <input
+                    id="loginEmail"
                     type="email"
-                    id="email"
-                    placeholder="Votre adresse email"
                     autocomplete="username"
                     required
                 >
@@ -482,16 +601,15 @@
             </div>
 
 
-            <div class="champ-connexion">
+            <div class="login-field">
 
-                <label for="motDePasse">
+                <label for="loginPassword">
                     Mot de passe
                 </label>
 
                 <input
+                    id="loginPassword"
                     type="password"
-                    id="motDePasse"
-                    placeholder="Votre mot de passe"
                     autocomplete="current-password"
                     required
                 >
@@ -500,9 +618,9 @@
 
 
             <button
+                class="login-button"
+                id="loginButton"
                 type="submit"
-                class="btn-connexion"
-                id="boutonConnexion"
             >
                 Se connecter
             </button>
@@ -510,7 +628,10 @@
         </form>
 
 
-        <div id="messageConnexion"></div>
+        <div
+            class="login-error"
+            id="loginError"
+        ></div>
 
     </div>
 
@@ -522,174 +643,222 @@
      APPLICATION
 ===================================================== -->
 
-<div id="application">
+<div id="app">
 
-    <div class="container">
 
-        <!-- EN-TETE -->
+    <header class="header">
 
-        <div class="entete">
+        <div class="header-title">
+            💰 Gestion compte famille
+        </div>
 
-            <h1>
-                Gestion compte famille
-            </h1>
 
-            <div class="zone-compte">
+        <div class="account-zone">
 
-                <span
-                    class="email-utilisateur"
-                    id="emailUtilisateur"
-                ></span>
+            <span
+                class="account-email"
+                id="accountEmail"
+            ></span>
 
-                <button
-                    class="btn-deconnexion"
-                    onclick="seDeconnecter()"
-                >
-                    Se déconnecter
-                </button>
-
-            </div>
+            <button
+                class="logout-button"
+                onclick="logout()"
+            >
+                Se déconnecter
+            </button>
 
         </div>
+
+    </header>
+
+
+
+    <main class="container">
 
 
         <!-- =================================================
              REVENUS
         ================================================== -->
 
-        <div class="card">
+        <section class="card">
 
-            <div class="section-titre">
+            <div class="card-title">
 
                 <h2>
-                    Revenus
+                    💰 Revenus
                 </h2>
 
             </div>
 
+
             <div id="revenus"></div>
+
+
+            <button
+                class="add-button"
+                onclick="addLine('revenus')"
+            >
+                + Ajouter une ligne
+            </button>
+
 
             <div class="total">
 
-                Total revenus :
-                <span id="totalRevenus">
+                <span>
+                    Total
+                </span>
+
+                <span
+                    class="total-value"
+                    id="totalRevenus"
+                >
                     0,00 €
                 </span>
 
             </div>
 
-        </div>
+        </section>
+
 
 
         <!-- =================================================
              CHARGES
         ================================================== -->
 
-        <div class="card">
+        <section class="card">
 
-            <div class="section-titre">
+            <div class="card-title">
 
                 <h2>
-                    Charges
+                    🏠 Charges
                 </h2>
-
-                <button
-                    class="btn-ajouter"
-                    onclick="ajouterLigne('charges')"
-                >
-                    + Ajouter une ligne
-                </button>
 
             </div>
 
+
             <div id="charges"></div>
+
+
+            <button
+                class="add-button"
+                onclick="addLine('charges')"
+            >
+                + Ajouter une ligne
+            </button>
+
 
             <div class="total">
 
-                Total charges :
-                <span id="totalCharges">
+                <span>
+                    Total
+                </span>
+
+                <span
+                    class="total-value"
+                    id="totalCharges"
+                >
                     0,00 €
                 </span>
 
             </div>
 
-        </div>
+        </section>
+
 
 
         <!-- =================================================
              ABONNEMENTS
         ================================================== -->
 
-        <div class="card">
+        <section class="card">
 
-            <div class="section-titre">
+            <div class="card-title">
 
                 <h2>
-                    Abonnements
+                    🧮 Abonnements
                 </h2>
-
-                <button
-                    class="btn-ajouter"
-                    onclick="ajouterLigne('abonnements')"
-                >
-                    + Ajouter une ligne
-                </button>
 
             </div>
 
+
             <div id="abonnements"></div>
+
+
+            <button
+                class="add-button"
+                onclick="addLine('abonnements')"
+            >
+                + Ajouter une ligne
+            </button>
+
 
             <div class="total">
 
-                Total abonnements :
-                <span id="totalAbonnements">
+                <span>
+                    Total
+                </span>
+
+                <span
+                    class="total-value"
+                    id="totalAbonnements"
+                >
                     0,00 €
                 </span>
 
             </div>
 
-        </div>
+        </section>
+
 
 
         <!-- =================================================
              CONSOMMABLES
         ================================================== -->
 
-        <div class="card">
+        <section class="card">
 
-            <div class="section-titre">
+            <div class="card-title">
 
                 <h2>
-                    Consommables
+                    🛒 Consommables
                 </h2>
-
-                <button
-                    class="btn-ajouter"
-                    onclick="ajouterConsommable()"
-                >
-                    + Ajouter une ligne
-                </button>
 
             </div>
 
+
             <div id="consommables"></div>
+
+
+            <button
+                class="add-button"
+                onclick="addConsumable()"
+            >
+                + Ajouter une ligne
+            </button>
+
 
             <div class="total">
 
-                Total consommables :
-                <span id="totalConsommables">
+                <span>
+                    Total
+                </span>
+
+                <span
+                    class="total-value"
+                    id="totalConsommables"
+                >
                     0,00 €
                 </span>
 
             </div>
 
 
-            <h3 style="margin-top: 25px;">
+            <h3>
                 Répartition des consommables
             </h3>
 
 
-            <table class="tableau-recap">
+            <table class="recap-table">
 
                 <thead>
 
@@ -711,52 +880,64 @@
 
                 </thead>
 
-                <tbody id="recapConsommables"></tbody>
+                <tbody
+                    id="recapConsommables"
+                ></tbody>
 
             </table>
 
-        </div>
+        </section>
+
 
 
         <!-- =================================================
              AUTRES DEPENSES
         ================================================== -->
 
-        <div class="card">
+        <section class="card">
 
-            <div class="section-titre">
+            <div class="card-title">
 
                 <h2>
-                    Autres dépenses
+                    💳 Autres dépenses
                 </h2>
-
-                <button
-                    class="btn-ajouter"
-                    onclick="ajouterLigne('autresDepenses')"
-                >
-                    + Ajouter une ligne
-                </button>
 
             </div>
 
+
             <div id="autresDepenses"></div>
+
+
+            <button
+                class="add-button"
+                onclick="addLine('autresDepenses')"
+            >
+                + Ajouter une ligne
+            </button>
+
 
             <div class="total">
 
-                Total autres dépenses :
-                <span id="totalAutresDepenses">
+                <span>
+                    Total
+                </span>
+
+                <span
+                    class="total-value"
+                    id="totalAutresDepenses"
+                >
                     0,00 €
                 </span>
 
             </div>
 
 
-            <h3 style="margin-top: 25px;">
+            <h3>
                 Répartition des autres dépenses
             </h3>
 
 
-            <table class="tableau-recap">
+            <table class="recap-table">
 
                 <thead>
 
@@ -778,113 +959,85 @@
 
                 </thead>
 
-                <tbody id="recapAutresDepenses"></tbody>
+                <tbody
+                    id="recapAutresDepenses"
+                ></tbody>
 
             </table>
 
-        </div>
+        </section>
+
 
 
         <!-- =================================================
-             EPARGNES FIXES
+             EPARGNES
         ================================================== -->
 
-        <div class="card">
+        <section class="card">
 
-            <div class="section-titre">
+            <div class="card-title">
 
                 <h2>
-                    Épargnes fixes
+                    🏦 Épargnes fixes
                 </h2>
-
-                <button
-                    class="btn-ajouter"
-                    onclick="ajouterLigne('epargnes')"
-                >
-                    + Ajouter une ligne
-                </button>
 
             </div>
 
+
             <div id="epargnes"></div>
+
+
+            <button
+                class="add-button"
+                onclick="addLine('epargnes')"
+            >
+                + Ajouter une ligne
+            </button>
+
 
             <div class="total">
 
-                Total épargnes fixes :
-                <span id="totalEpargnes">
+                <span>
+                    Total
+                </span>
+
+                <span
+                    class="total-value"
+                    id="totalEpargnes"
+                >
                     0,00 €
                 </span>
 
             </div>
 
-        </div>
+        </section>
+
 
 
         <!-- =================================================
-             RESUME
+             GRAPHIQUE
         ================================================== -->
 
-        <div class="card">
+        <section class="chart-card">
 
             <h2>
-                Répartition du budget
+                📊 Répartition du budget
             </h2>
 
 
-            <div class="resume">
-
-                <div class="resume-box">
-
-                    <span>
-                        Total revenus
-                    </span>
-
-                    <strong id="resumeRevenus">
-                        0,00 €
-                    </strong>
-
-                </div>
-
-
-                <div class="resume-box">
-
-                    <span>
-                        Total dépenses
-                    </span>
-
-                    <strong id="resumeDepenses">
-                        0,00 €
-                    </strong>
-
-                </div>
-
-
-                <div class="resume-box">
-
-                    <span>
-                        Reste du mois
-                    </span>
-
-                    <strong id="resumeReste">
-                        0,00 €
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div class="graphique-wrapper">
+            <div class="chart-area">
 
                 <div
-                    class="graphique"
-                    id="graphique"
+                    class="donut"
+                    id="donut"
                 >
 
-                    <div class="graphique-centre">
+                    <div class="donut-center">
 
-                        <strong id="graphiqueMontant">
-                            0 €
+                        <strong
+                            id="donutAmount"
+                        >
+                            0,00 €
                         </strong>
 
                         <span>
@@ -899,16 +1052,17 @@
 
 
             <div
-                class="legende"
-                id="legende"
+                class="legend"
+                id="legend"
             ></div>
 
 
-            <div id="alerte"></div>
+            <div id="alert"></div>
 
-        </div>
+        </section>
 
-    </div>
+
+    </main>
 
 </div>
 
@@ -923,268 +1077,32 @@
 const SUPABASE_URL =
     "https://pxbpttysmfmdzmelyxzx.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
+const SUPABASE_KEY =
     "sb_publishable_hEpQtpSMq_lCS-TjdefpFQ_kSg9ttZ4";
 
-const clientSupabase =
+
+const supabaseClient =
     window.supabase.createClient(
         SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
+        SUPABASE_KEY
     );
-
-
-/* =========================================================
-   ELEMENTS CONNEXION
-========================================================= */
-
-const formConnexion =
-    document.getElementById("formConnexion");
-
-const boutonConnexion =
-    document.getElementById("boutonConnexion");
-
-const messageConnexion =
-    document.getElementById("messageConnexion");
-
-
-/* =========================================================
-   MESSAGES CONNEXION
-========================================================= */
-
-function afficherErreurConnexion(message) {
-
-    messageConnexion.textContent = message;
-
-    messageConnexion.className = "erreur";
-
-}
-
-
-function effacerErreurConnexion() {
-
-    messageConnexion.textContent = "";
-
-    messageConnexion.className = "";
-
-}
-
-
-/* =========================================================
-   AFFICHER APPLICATION
-========================================================= */
-
-function afficherApplication(session) {
-
-    document.getElementById(
-        "pageConnexion"
-    ).style.display = "none";
-
-    document.getElementById(
-        "application"
-    ).style.display = "block";
-
-
-    if (
-        session &&
-        session.user
-    ) {
-
-        document.getElementById(
-            "emailUtilisateur"
-        ).textContent =
-            session.user.email || "";
-
-    }
-
-}
-
-
-/* =========================================================
-   AFFICHER CONNEXION
-========================================================= */
-
-function afficherConnexion() {
-
-    document.getElementById(
-        "pageConnexion"
-    ).style.display = "flex";
-
-    document.getElementById(
-        "application"
-    ).style.display = "none";
-
-}
-
-
-/* =========================================================
-   CONNEXION
-========================================================= */
-
-formConnexion.addEventListener(
-    "submit",
-    async function(event) {
-
-        event.preventDefault();
-
-        effacerErreurConnexion();
-
-
-        const email =
-            document.getElementById(
-                "email"
-            ).value.trim();
-
-
-        const motDePasse =
-            document.getElementById(
-                "motDePasse"
-            ).value;
-
-
-        boutonConnexion.disabled = true;
-
-        boutonConnexion.textContent =
-            "Connexion...";
-
-
-        const {
-            data,
-            error
-        } =
-            await clientSupabase.auth.signInWithPassword({
-
-                email: email,
-
-                password: motDePasse
-
-            });
-
-
-        if (error) {
-
-            afficherErreurConnexion(
-                "Email ou mot de passe incorrect."
-            );
-
-            boutonConnexion.disabled = false;
-
-            boutonConnexion.textContent =
-                "Se connecter";
-
-            return;
-
-        }
-
-
-        if (data.session) {
-
-            afficherApplication(
-                data.session
-            );
-
-        }
-
-
-        boutonConnexion.disabled = false;
-
-        boutonConnexion.textContent =
-            "Se connecter";
-
-    }
-);
-
-
-/* =========================================================
-   DECONNEXION
-========================================================= */
-
-async function seDeconnecter() {
-
-    await clientSupabase.auth.signOut();
-
-    afficherConnexion();
-
-    document.getElementById(
-        "email"
-    ).value = "";
-
-    document.getElementById(
-        "motDePasse"
-    ).value = "";
-
-}
-
-
-/* =========================================================
-   VERIFIER SESSION
-========================================================= */
-
-async function verifierSession() {
-
-    const {
-        data: {
-            session
-        }
-    } =
-        await clientSupabase.auth.getSession();
-
-
-    if (session) {
-
-        afficherApplication(
-            session
-        );
-
-    } else {
-
-        afficherConnexion();
-
-    }
-
-}
-
-
-/* =========================================================
-   SURVEILLER LA SESSION
-========================================================= */
-
-clientSupabase.auth.onAuthStateChange(
-    function(event, session) {
-
-        if (session) {
-
-            afficherApplication(
-                session
-            );
-
-        } else {
-
-            afficherConnexion();
-
-        }
-
-    }
-);
 
 
 /* =========================================================
    DONNEES
 ========================================================= */
 
-const donnees = {
+const data = {
 
     revenus: [
-
         {
             nom: "Salaire 1",
             montant: 0
         },
-
         {
             nom: "Salaire 2",
             montant: 0
         }
-
     ],
 
     charges: [],
@@ -1204,9 +1122,9 @@ const donnees = {
    FORMAT EURO
 ========================================================= */
 
-function formatEuro(montant) {
+function euro(value) {
 
-    return montant.toLocaleString(
+    return Number(value || 0).toLocaleString(
         "fr-FR",
         {
             minimumFractionDigits: 2,
@@ -1221,9 +1139,9 @@ function formatEuro(montant) {
    SECURITE HTML
 ========================================================= */
 
-function escapeHtml(texte) {
+function safe(value) {
 
-    return String(texte)
+    return String(value || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -1234,88 +1152,89 @@ function escapeHtml(texte) {
 
 
 /* =========================================================
-   AFFICHER LIGNES CLASSIQUES
+   TOTAL CATEGORIE
 ========================================================= */
 
-function afficherLignes(categorie) {
+function total(category) {
 
-    const conteneur =
-        document.getElementById(
-            categorie
-        );
+    return data[category].reduce(
+        (sum, line) =>
+            sum + (Number(line.montant) || 0),
+        0
+    );
 
-    const lignes =
-        donnees[categorie];
+}
 
 
-    if (
-        lignes.length === 0
-    ) {
+/* =========================================================
+   AFFICHER LIGNES
+========================================================= */
 
-        conteneur.innerHTML =
-            '<div class="vide">Aucune ligne ajoutée.</div>';
+function renderLines(category) {
+
+    const container =
+        document.getElementById(category);
+
+    const lines =
+        data[category];
+
+
+    if (lines.length === 0) {
+
+        container.innerHTML =
+            '<div class="empty">Aucune ligne ajoutée.</div>';
 
         return;
 
     }
 
 
-    conteneur.innerHTML =
+    container.innerHTML =
+        lines.map(
+            (line, index) => `
 
-        lignes.map(
-            (ligne, index) => {
+                <div class="line">
 
-                return `
+                    <input
+                        type="text"
+                        value="${safe(line.nom)}"
+                        placeholder="Nom"
+                        oninput="
+                            data.${category}[${index}].nom =
+                            this.value
+                        "
+                    >
 
-                    <div class="ligne">
 
-                        <input
-                            type="text"
-                            value="${escapeHtml(
-                                ligne.nom
-                            )}"
-                            placeholder="Nom"
-                            onchange="
-                                modifierNom(
-                                    '${categorie}',
-                                    ${index},
-                                    this.value
-                                )
-                            "
-                        >
+                    <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="${line.montant || ""}"
+                        placeholder="Montant"
+                        oninput="
+                            data.${category}[${index}].montant =
+                            Number(this.value) || 0;
+                            update();
+                        "
+                    >
 
-                        <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value="${ligne.montant || ""}"
-                            placeholder="0 €"
-                            oninput="
-                                modifierMontant(
-                                    '${categorie}',
-                                    ${index},
-                                    this.value
-                                )
-                            "
-                        >
 
-                        <button
-                            class="btn-supprimer"
-                            onclick="
-                                supprimerLigne(
-                                    '${categorie}',
-                                    ${index}
-                                )
-                            "
-                        >
-                            ×
-                        </button>
+                    <button
+                        class="delete-button"
+                        onclick="
+                            deleteLine(
+                                '${category}',
+                                ${index}
+                            )
+                        "
+                    >
+                        ×
+                    </button>
 
-                    </div>
+                </div>
 
-                `;
-
-            }
+            `
         ).join("");
 
 }
@@ -1325,42 +1244,41 @@ function afficherLignes(categorie) {
    AFFICHER CONSOMMABLES
 ========================================================= */
 
-function afficherConsommables() {
+function renderConsumables() {
 
-    const conteneur =
+    const container =
         document.getElementById(
             "consommables"
         );
 
 
     if (
-        donnees.consommables.length === 0
+        data.consommables.length === 0
     ) {
 
-        conteneur.innerHTML =
-            '<div class="vide">Aucune ligne ajoutée.</div>';
+        container.innerHTML =
+            '<div class="empty">Aucune ligne ajoutée.</div>';
 
         return;
 
     }
 
 
-    conteneur.innerHTML =
+    container.innerHTML =
+        data.consommables.map(
+            (line, index) => {
 
-        donnees.consommables.map(
-            (ligne, index) => {
-
-                const estManuel =
-                    ligne.type === "manuel";
+                const manual =
+                    line.type === "manuel";
 
 
                 return `
 
-                    <div class="ligne-consommable">
+                    <div class="consumable-line">
 
                         <select
                             onchange="
-                                changerTypeConsommable(
+                                changeConsumableType(
                                     ${index},
                                     this.value
                                 )
@@ -1369,7 +1287,7 @@ function afficherConsommables() {
 
                             <option
                                 value="Carburant A"
-                                ${ligne.type === "Carburant A"
+                                ${line.type === "Carburant A"
                                     ? "selected"
                                     : ""}
                             >
@@ -1378,7 +1296,7 @@ function afficherConsommables() {
 
                             <option
                                 value="Carburant B"
-                                ${ligne.type === "Carburant B"
+                                ${line.type === "Carburant B"
                                     ? "selected"
                                     : ""}
                             >
@@ -1387,7 +1305,7 @@ function afficherConsommables() {
 
                             <option
                                 value="Course de la semaine"
-                                ${ligne.type === "Course de la semaine"
+                                ${line.type === "Course de la semaine"
                                     ? "selected"
                                     : ""}
                             >
@@ -1396,7 +1314,7 @@ function afficherConsommables() {
 
                             <option
                                 value="Complément course"
-                                ${ligne.type === "Complément course"
+                                ${line.type === "Complément course"
                                     ? "selected"
                                     : ""}
                             >
@@ -1405,7 +1323,7 @@ function afficherConsommables() {
 
                             <option
                                 value="manuel"
-                                ${estManuel
+                                ${manual
                                     ? "selected"
                                     : ""}
                             >
@@ -1416,53 +1334,54 @@ function afficherConsommables() {
 
 
                         ${
-                            estManuel
+                            manual
 
                             ?
 
                             `
                                 <input
+                                    class="manual-name"
                                     type="text"
-                                    placeholder="Nom de la dépense"
-                                    value="${escapeHtml(
-                                        ligne.nom || ""
+                                    placeholder="Nom"
+                                    value="${safe(
+                                        line.nom
                                     )}"
                                     oninput="
-                                        modifierNomConsommable(
-                                            ${index},
-                                            this.value
-                                        )
+                                        data.consommables[
+                                            ${index}
+                                        ].nom =
+                                        this.value
                                     "
                                 >
                             `
 
                             :
 
-                            `
-                                <div></div>
-                            `
+                            `<div></div>`
                         }
 
 
                         <input
+                            class="amount-input"
                             type="number"
                             min="0"
                             step="0.01"
-                            value="${ligne.montant || ""}"
-                            placeholder="0 €"
+                            value="${line.montant || ""}"
+                            placeholder="Montant"
                             oninput="
-                                modifierMontantConsommable(
-                                    ${index},
-                                    this.value
-                                )
+                                data.consommables[
+                                    ${index}
+                                ].montant =
+                                Number(this.value) || 0;
+                                update();
                             "
                         >
 
 
                         <button
-                            class="btn-supprimer"
+                            class="delete-button"
                             onclick="
-                                supprimerConsommable(
+                                deleteConsumable(
                                     ${index}
                                 )
                             "
@@ -1481,12 +1400,12 @@ function afficherConsommables() {
 
 
 /* =========================================================
-   AJOUTER LIGNE
+   AJOUT LIGNE
 ========================================================= */
 
-function ajouterLigne(categorie) {
+function addLine(category) {
 
-    donnees[categorie].push({
+    data[category].push({
 
         nom: "",
 
@@ -1495,22 +1414,20 @@ function ajouterLigne(categorie) {
     });
 
 
-    afficherLignes(
-        categorie
-    );
+    renderLines(category);
 
-    mettreAJour();
+    update();
 
 }
 
 
 /* =========================================================
-   AJOUTER CONSOMMABLE
+   AJOUT CONSOMMABLE
 ========================================================= */
 
-function ajouterConsommable() {
+function addConsumable() {
 
-    donnees.consommables.push({
+    data.consommables.push({
 
         type: "Carburant A",
 
@@ -1521,108 +1438,9 @@ function ajouterConsommable() {
     });
 
 
-    afficherConsommables();
+    renderConsumables();
 
-    mettreAJour();
-
-}
-
-
-/* =========================================================
-   MODIFIER NOM
-========================================================= */
-
-function modifierNom(
-    categorie,
-    index,
-    valeur
-) {
-
-    donnees[categorie][index].nom =
-        valeur;
-
-    mettreAJour();
-
-}
-
-
-function modifierNomConsommable(
-    index,
-    valeur
-) {
-
-    donnees.consommables[index].nom =
-        valeur;
-
-    mettreAJour();
-
-}
-
-
-/* =========================================================
-   MODIFIER MONTANT
-========================================================= */
-
-function modifierMontant(
-    categorie,
-    index,
-    valeur
-) {
-
-    donnees[categorie][index].montant =
-        parseFloat(valeur) || 0;
-
-    mettreAJour();
-
-}
-
-
-function modifierMontantConsommable(
-    index,
-    valeur
-) {
-
-    donnees.consommables[index].montant =
-        parseFloat(valeur) || 0;
-
-    mettreAJour();
-
-}
-
-
-/* =========================================================
-   CHANGER TYPE CONSOMMABLE
-========================================================= */
-
-function changerTypeConsommable(
-    index,
-    valeur
-) {
-
-    if (
-        valeur === "manuel"
-    ) {
-
-        donnees.consommables[index].type =
-            "manuel";
-
-        donnees.consommables[index].nom =
-            "";
-
-    } else {
-
-        donnees.consommables[index].type =
-            valeur;
-
-        donnees.consommables[index].nom =
-            "";
-
-    }
-
-
-    afficherConsommables();
-
-    mettreAJour();
+    update();
 
 }
 
@@ -1631,64 +1449,61 @@ function changerTypeConsommable(
    SUPPRESSION
 ========================================================= */
 
-function supprimerLigne(
-    categorie,
+function deleteLine(
+    category,
     index
 ) {
 
-    donnees[categorie].splice(
+    data[category].splice(
         index,
         1
     );
 
-    afficherLignes(
-        categorie
-    );
+    renderLines(category);
 
-    mettreAJour();
+    update();
 
 }
 
 
-function supprimerConsommable(
-    index
-) {
+function deleteConsumable(index) {
 
-    donnees.consommables.splice(
+    data.consommables.splice(
         index,
         1
     );
 
-    afficherConsommables();
+    renderConsumables();
 
-    mettreAJour();
+    update();
 
 }
 
 
 /* =========================================================
-   TOTAL
+   CHANGEMENT CONSOMMABLE
 ========================================================= */
 
-function totalCategorie(categorie) {
+function changeConsumableType(
+    index,
+    value
+) {
 
-    return donnees[categorie].reduce(
+    data.consommables[index].type =
+        value;
 
-        (
-            total,
-            ligne
-        ) =>
 
-            total +
-            (
-                parseFloat(
-                    ligne.montant
-                ) || 0
-            ),
+    if (value !== "manuel") {
 
-        0
+        data.consommables[index].nom =
+            "";
 
-    );
+    }
+
+
+    renderConsumables();
+
+    update();
 
 }
 
@@ -1697,68 +1512,49 @@ function totalCategorie(categorie) {
    RECAP CONSOMMABLES
 ========================================================= */
 
-function mettreAJourRecapConsommables() {
-
-    const total =
-        totalCategorie(
-            "consommables"
-        );
-
+function updateConsumableRecap() {
 
     let carburantA = 0;
-
     let carburantB = 0;
-
-    let courseSemaine = 0;
-
-    let autresConsommables = 0;
+    let course = 0;
+    let autres = 0;
 
 
-    donnees.consommables.forEach(
-        ligne => {
+    data.consommables.forEach(
+        line => {
 
-            const montant =
-                parseFloat(
-                    ligne.montant
-                ) || 0;
+            const amount =
+                Number(line.montant) || 0;
 
 
             if (
-                ligne.type ===
-                "Carburant A"
+                line.type === "Carburant A"
             ) {
 
-                carburantA += montant;
+                carburantA += amount;
 
             }
 
             else if (
-                ligne.type ===
-                "Carburant B"
+                line.type === "Carburant B"
             ) {
 
-                carburantB += montant;
+                carburantB += amount;
 
             }
 
             else if (
-                ligne.type ===
+                line.type ===
                 "Course de la semaine"
             ) {
 
-                courseSemaine += montant;
+                course += amount;
 
             }
 
-            else if (
-                ligne.type ===
-                "Complément course" ||
-                ligne.type ===
-                "manuel"
-            ) {
+            else {
 
-                autresConsommables +=
-                    montant;
+                autres += amount;
 
             }
 
@@ -1766,27 +1562,34 @@ function mettreAJourRecapConsommables() {
     );
 
 
-    const lignes = [
+    const totalConsumables =
+        carburantA +
+        carburantB +
+        course +
+        autres;
 
-        {
-            nom: "Carburant A",
-            montant: carburantA
-        },
 
-        {
-            nom: "Carburant B",
-            montant: carburantB
-        },
+    const rows = [
 
-        {
-            nom: "Course de la semaine",
-            montant: courseSemaine
-        },
+        [
+            "Carburant A",
+            carburantA
+        ],
 
-        {
-            nom: "Autres consommables",
-            montant: autresConsommables
-        }
+        [
+            "Carburant B",
+            carburantB
+        ],
+
+        [
+            "Course de la semaine",
+            course
+        ],
+
+        [
+            "Autres consommables",
+            autres
+        ]
 
     ];
 
@@ -1795,14 +1598,14 @@ function mettreAJourRecapConsommables() {
         "recapConsommables"
     ).innerHTML =
 
-        lignes.map(
-            ligne => {
+        rows.map(
+            row => {
 
-                const pourcentage =
-                    total > 0
+                const percent =
+                    totalConsumables > 0
                     ? (
-                        ligne.montant /
-                        total
+                        row[1] /
+                        totalConsumables
                     ) * 100
                     : 0;
 
@@ -1812,17 +1615,15 @@ function mettreAJourRecapConsommables() {
                     <tr>
 
                         <td>
-                            ${ligne.nom}
+                            ${row[0]}
                         </td>
 
                         <td>
-                            ${formatEuro(
-                                ligne.montant
-                            )}
+                            ${euro(row[1])}
                         </td>
 
                         <td>
-                            ${pourcentage.toFixed(1)} %
+                            ${percent.toFixed(1)} %
                         </td>
 
                     </tr>
@@ -1843,11 +1644,13 @@ function mettreAJourRecapConsommables() {
                 </th>
 
                 <th>
-                    ${formatEuro(total)}
+                    ${euro(
+                        totalConsumables
+                    )}
                 </th>
 
                 <th>
-                    ${total > 0
+                    ${totalConsumables > 0
                         ? "100,0"
                         : "0,0"} %
                 </th>
@@ -1863,12 +1666,10 @@ function mettreAJourRecapConsommables() {
    RECAP AUTRES DEPENSES
 ========================================================= */
 
-function mettreAJourRecapAutresDepenses() {
+function updateOtherExpensesRecap() {
 
-    const total =
-        totalCategorie(
-            "autresDepenses"
-        );
+    const totalExpenses =
+        total("autresDepenses");
 
 
     const tbody =
@@ -1878,7 +1679,7 @@ function mettreAJourRecapAutresDepenses() {
 
 
     if (
-        donnees.autresDepenses.length === 0
+        data.autresDepenses.length === 0
     ) {
 
         tbody.innerHTML = `
@@ -1899,21 +1700,18 @@ function mettreAJourRecapAutresDepenses() {
 
 
     tbody.innerHTML =
+        data.autresDepenses.map(
+            line => {
 
-        donnees.autresDepenses.map(
-            ligne => {
-
-                const montant =
-                    parseFloat(
-                        ligne.montant
-                    ) || 0;
+                const amount =
+                    Number(line.montant) || 0;
 
 
-                const pourcentage =
-                    total > 0
+                const percent =
+                    totalExpenses > 0
                     ? (
-                        montant /
-                        total
+                        amount /
+                        totalExpenses
                     ) * 100
                     : 0;
 
@@ -1923,20 +1721,18 @@ function mettreAJourRecapAutresDepenses() {
                     <tr>
 
                         <td>
-                            ${escapeHtml(
-                                ligne.nom ||
+                            ${safe(
+                                line.nom ||
                                 "Sans nom"
                             )}
                         </td>
 
                         <td>
-                            ${formatEuro(
-                                montant
-                            )}
+                            ${euro(amount)}
                         </td>
 
                         <td>
-                            ${pourcentage.toFixed(1)} %
+                            ${percent.toFixed(1)} %
                         </td>
 
                     </tr>
@@ -1953,76 +1749,58 @@ function mettreAJourRecapAutresDepenses() {
    GRAPHIQUE
 ========================================================= */
 
-function mettreAJourGraphique() {
+function updateChart() {
 
     const revenus =
-        totalCategorie(
-            "revenus"
-        );
+        total("revenus");
 
     const charges =
-        totalCategorie(
-            "charges"
-        );
+        total("charges");
 
     const abonnements =
-        totalCategorie(
-            "abonnements"
-        );
+        total("abonnements");
 
     const autresDepenses =
-        totalCategorie(
-            "autresDepenses"
-        );
+        total("autresDepenses");
 
     const epargnes =
-        totalCategorie(
-            "epargnes"
-        );
+        total("epargnes");
 
 
     let carburant = 0;
-
-    let courseSemaine = 0;
-
+    let course = 0;
     let autresConsommables = 0;
 
 
-    donnees.consommables.forEach(
-        ligne => {
+    data.consommables.forEach(
+        line => {
 
-            const montant =
-                parseFloat(
-                    ligne.montant
-                ) || 0;
+            const amount =
+                Number(line.montant) || 0;
 
 
             if (
-                ligne.type === "Carburant A" ||
-                ligne.type === "Carburant B"
+                line.type === "Carburant A" ||
+                line.type === "Carburant B"
             ) {
 
-                carburant += montant;
+                carburant += amount;
 
             }
 
             else if (
-                ligne.type ===
+                line.type ===
                 "Course de la semaine"
             ) {
 
-                courseSemaine += montant;
+                course += amount;
 
             }
 
-            else if (
-                ligne.type ===
-                "Complément course" ||
-                ligne.type === "manuel"
-            ) {
+            else {
 
                 autresConsommables +=
-                    montant;
+                    amount;
 
             }
 
@@ -2030,203 +1808,191 @@ function mettreAJourGraphique() {
     );
 
 
-    const totalDepenses =
-
+    const expenses =
         charges +
         abonnements +
         carburant +
-        courseSemaine +
+        course +
         autresConsommables +
         autresDepenses +
         epargnes;
 
 
-    const reste =
-        revenus -
-        totalDepenses;
+    const remaining =
+        revenus - expenses;
 
 
     const categories = [
 
         {
-            nom: "Charges",
-            montant: charges
+            name: "Charges",
+            value: charges,
+            color: "#4e79a7"
         },
 
         {
-            nom: "Abonnements",
-            montant: abonnements
+            name: "Abonnements",
+            value: abonnements,
+            color: "#f28e2b"
         },
 
         {
-            nom: "Carburant",
-            montant: carburant
+            name: "Carburant",
+            value: carburant,
+            color: "#e15759"
         },
 
         {
-            nom: "Course de la semaine",
-            montant: courseSemaine
+            name: "Course de la semaine",
+            value: course,
+            color: "#76b7b2"
         },
 
         {
-            nom: "Autres consommables",
-            montant: autresConsommables
+            name: "Autres consommables",
+            value: autresConsommables,
+            color: "#59a14f"
         },
 
         {
-            nom: "Autres dépenses",
-            montant: autresDepenses
+            name: "Autres dépenses",
+            value: autresDepenses,
+            color: "#edc949"
         },
 
         {
-            nom: "Épargnes fixes",
-            montant: epargnes
+            name: "Épargnes fixes",
+            value: epargnes,
+            color: "#af7aa1"
         },
 
         {
-            nom: "Reste du mois",
-            montant: Math.max(
-                reste,
+            name: "Reste du mois",
+            value: Math.max(
+                remaining,
                 0
-            )
+            ),
+            color: "#bab0ab"
         }
 
     ];
 
 
-    const couleurs = [
-
-        "#4e79a7",
-        "#f28e2b",
-        "#e15759",
-        "#76b7b2",
-        "#59a14f",
-        "#edc949",
-        "#af7aa1",
-        "#bab0ab"
-
-    ];
-
-
-    const graphique =
+    const donut =
         document.getElementById(
-            "graphique"
+            "donut"
         );
 
 
-    if (
-        revenus <= 0
-    ) {
-
-        graphique.style.background =
-            "#ddd";
-
-    } else {
-
-        let debut = 0;
-
-        const segments = [];
+    document.getElementById(
+        "donutAmount"
+    ).textContent =
+        euro(revenus);
 
 
-        categories.forEach(
-            (categorie, index) => {
+    if (revenus <= 0) {
 
-                const pourcentage =
-                    (
-                        categorie.montant /
-                        revenus
-                    ) * 100;
+        donut.style.background =
+            "#e0e2e5";
 
+        document.getElementById(
+            "legend"
+        ).innerHTML = "";
 
-                if (
-                    pourcentage > 0
-                ) {
-
-                    const fin =
-                        debut +
-                        pourcentage;
-
-
-                    segments.push(
-                        `${couleurs[index]} ${debut}% ${fin}%`
-                    );
-
-
-                    debut = fin;
-
-                }
-
-            }
-        );
-
-
-        graphique.style.background =
-            `conic-gradient(
-                ${segments.join(", ")}
-            )`;
+        return;
 
     }
 
 
-    document.getElementById(
-        "graphiqueMontant"
-    ).textContent =
-        formatEuro(revenus);
+    let current = 0;
+
+    const segments = [];
+
+
+    categories.forEach(
+        category => {
+
+            if (
+                category.value <= 0
+            ) {
+                return;
+            }
+
+
+            const percentage =
+                (
+                    category.value /
+                    revenus
+                ) * 100;
+
+
+            const end =
+                current +
+                percentage;
+
+
+            segments.push(
+                `${category.color} ${current}% ${end}%`
+            );
+
+
+            current = end;
+
+        }
+    );
+
+
+    donut.style.background =
+        `conic-gradient(
+            ${segments.join(",")}
+        )`;
 
 
     document.getElementById(
-        "legende"
+        "legend"
     ).innerHTML =
 
         categories
             .filter(
-                categorie =>
-                    categorie.montant > 0
+                category =>
+                    category.value > 0
             )
             .map(
-                categorie => {
+                category => {
 
-                    const index =
-                        categories.indexOf(
-                            categorie
-                        );
-
-
-                    const pourcentage =
-                        revenus > 0
-                        ? (
-                            categorie.montant /
+                    const percentage =
+                        (
+                            category.value /
                             revenus
-                        ) * 100
-                        : 0;
+                        ) * 100;
 
 
                     return `
 
-                        <div class="legende-ligne">
+                        <div class="legend-row">
 
-                            <div class="legende-gauche">
+                            <div class="legend-left">
 
-                                <div
-                                    class="pastille"
+                                <span
+                                    class="legend-dot"
                                     style="
                                         background:
-                                        ${couleurs[index]}
+                                        ${category.color}
                                     "
-                                ></div>
+                                ></span>
 
                                 <span>
-                                    ${categorie.nom}
+                                    ${category.name}
                                 </span>
 
                             </div>
 
                             <strong>
-                                ${formatEuro(
-                                    categorie.montant
+                                ${euro(
+                                    category.value
                                 )}
                                 —
-                                ${pourcentage.toFixed(1)} %
+                                ${percentage.toFixed(1)} %
                             </strong>
 
                         </div>
@@ -2241,140 +2007,88 @@ function mettreAJourGraphique() {
 
 
 /* =========================================================
-   MISE A JOUR GENERALE
+   MISE A JOUR
 ========================================================= */
 
-function mettreAJour() {
-
-    const revenus =
-        totalCategorie(
-            "revenus"
-        );
-
-    const charges =
-        totalCategorie(
-            "charges"
-        );
-
-    const abonnements =
-        totalCategorie(
-            "abonnements"
-        );
-
-    const consommables =
-        totalCategorie(
-            "consommables"
-        );
-
-    const autresDepenses =
-        totalCategorie(
-            "autresDepenses"
-        );
-
-    const epargnes =
-        totalCategorie(
-            "epargnes"
-        );
-
-
-    const totalDepenses =
-
-        charges +
-        abonnements +
-        consommables +
-        autresDepenses +
-        epargnes;
-
-
-    const reste =
-        revenus -
-        totalDepenses;
-
+function update() {
 
     document.getElementById(
         "totalRevenus"
     ).textContent =
-        formatEuro(revenus);
+        euro(total("revenus"));
 
 
     document.getElementById(
         "totalCharges"
     ).textContent =
-        formatEuro(charges);
+        euro(total("charges"));
 
 
     document.getElementById(
         "totalAbonnements"
     ).textContent =
-        formatEuro(abonnements);
+        euro(total("abonnements"));
 
 
     document.getElementById(
         "totalConsommables"
     ).textContent =
-        formatEuro(consommables);
+        euro(total("consommables"));
 
 
     document.getElementById(
         "totalAutresDepenses"
     ).textContent =
-        formatEuro(autresDepenses);
+        euro(total("autresDepenses"));
 
 
     document.getElementById(
         "totalEpargnes"
     ).textContent =
-        formatEuro(epargnes);
+        euro(total("epargnes"));
 
 
-    document.getElementById(
-        "resumeRevenus"
-    ).textContent =
-        formatEuro(revenus);
+    updateConsumableRecap();
+
+    updateOtherExpensesRecap();
+
+    updateChart();
 
 
-    document.getElementById(
-        "resumeDepenses"
-    ).textContent =
-        formatEuro(totalDepenses);
+    const revenus =
+        total("revenus");
 
 
-    document.getElementById(
-        "resumeReste"
-    ).textContent =
-        formatEuro(reste);
+    const expenses =
+        total("charges") +
+        total("abonnements") +
+        total("consommables") +
+        total("autresDepenses") +
+        total("epargnes");
 
 
-    const elementReste =
+    const remaining =
+        revenus - expenses;
+
+
+    const alert =
         document.getElementById(
-            "resumeReste"
-        );
-
-
-    elementReste.style.color =
-        reste < 0
-            ? "#e74c3c"
-            : "#222";
-
-
-    const alerte =
-        document.getElementById(
-            "alerte"
+            "alert"
         );
 
 
     if (
-        reste < 0
+        remaining < 0
     ) {
 
-        alerte.innerHTML = `
+        alert.innerHTML = `
 
-            <div class="alerte">
+            <div class="alert">
 
                 Attention : les dépenses dépassent
                 les revenus de
-                ${formatEuro(
-                    Math.abs(reste)
+                ${euro(
+                    Math.abs(remaining)
                 )}.
 
             </div>
@@ -2383,16 +2097,190 @@ function mettreAJour() {
 
     } else {
 
-        alerte.innerHTML = "";
+        alert.innerHTML = "";
 
     }
 
+}
 
-    mettreAJourGraphique();
 
-    mettreAJourRecapConsommables();
+/* =========================================================
+   LOGIN
+========================================================= */
 
-    mettreAJourRecapAutresDepenses();
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+
+loginForm.addEventListener(
+    "submit",
+    async event => {
+
+        event.preventDefault();
+
+
+        const email =
+            document.getElementById(
+                "loginEmail"
+            ).value.trim();
+
+
+        const password =
+            document.getElementById(
+                "loginPassword"
+            ).value;
+
+
+        const button =
+            document.getElementById(
+                "loginButton"
+            );
+
+
+        const error =
+            document.getElementById(
+                "loginError"
+            );
+
+
+        error.style.display =
+            "none";
+
+
+        button.disabled = true;
+
+        button.textContent =
+            "Connexion...";
+
+
+        const {
+            data: loginData,
+            error: loginError
+        } =
+            await supabaseClient.auth.signInWithPassword({
+
+                email: email,
+
+                password: password
+
+            });
+
+
+        if (loginError) {
+
+            error.textContent =
+                "Email ou mot de passe incorrect.";
+
+            error.style.display =
+                "block";
+
+            button.disabled = false;
+
+            button.textContent =
+                "Se connecter";
+
+            return;
+
+        }
+
+
+        showApp(
+            loginData.session
+        );
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "Se connecter";
+
+    }
+);
+
+
+/* =========================================================
+   AFFICHER APPLICATION
+========================================================= */
+
+function showApp(session) {
+
+    document.getElementById(
+        "loginPage"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "app"
+    ).style.display =
+        "block";
+
+
+    if (
+        session &&
+        session.user
+    ) {
+
+        document.getElementById(
+            "accountEmail"
+        ).textContent =
+            session.user.email || "";
+
+    }
+
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById(
+        "app"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "loginPage"
+    ).style.display =
+        "flex";
+
+
+    document.getElementById(
+        "loginPassword"
+    ).value = "";
+
+}
+
+
+/* =========================================================
+   SESSION EXISTANTE
+========================================================= */
+
+async function checkSession() {
+
+    const {
+        data
+    } =
+        await supabaseClient.auth.getSession();
+
+
+    if (
+        data.session
+    ) {
+
+        showApp(
+            data.session
+        );
+
+    }
 
 }
 
@@ -2401,21 +2289,40 @@ function mettreAJour() {
    INITIALISATION
 ========================================================= */
 
-afficherLignes("revenus");
+renderLines("revenus");
 
-afficherLignes("charges");
+renderLines("charges");
 
-afficherLignes("abonnements");
+renderLines("abonnements");
 
-afficherConsommables();
+renderConsumables();
 
-afficherLignes("autresDepenses");
+renderLines("autresDepenses");
 
-afficherLignes("epargnes");
+renderLines("epargnes");
 
-mettreAJour();
+update();
 
-verifierSession();
+checkSession();
+
+
+/* =========================================================
+   ECOUTE SESSION
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+    (event, session) => {
+
+        if (
+            session
+        ) {
+
+            showApp(session);
+
+        }
+
+    }
+);
 
 </script>
 
