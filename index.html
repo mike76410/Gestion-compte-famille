@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Gestion compte famille</title>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -18,7 +20,7 @@ body {
 }
 
 header {
-    background: #ffffff;
+    background: white;
     padding: 22px 20px;
     text-align: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -55,7 +57,15 @@ header h1 {
     margin-bottom: 8px;
 }
 
-input {
+.row-consommable {
+    display: grid;
+    grid-template-columns: 1fr 1fr 120px 40px;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+input,
+select {
     width: 100%;
     padding: 11px;
     border: 1px solid #d1d5db;
@@ -105,190 +115,279 @@ button {
     font-size: 17px;
 }
 
-.special {
-    background: #f8fafc;
-    padding: 12px;
-    border-radius: 12px;
-    margin-bottom: 8px;
-}
-
-.special-line {
-    display: grid;
-    grid-template-columns: 1fr 90px 120px;
-    gap: 8px;
-    align-items: center;
-}
-
-.percent {
-    text-align: center;
-}
-
-.amount {
-    background: #f8fafc;
-    text-align: right;
-    font-weight: bold;
-}
-
-.info {
-    font-size: 13px;
-    color: #64748b;
-    margin-top: 6px;
+.manual-hidden {
+    display: none;
 }
 
 @media (max-width: 600px) {
+
     .row {
         grid-template-columns: 1fr 90px 38px;
     }
 
-    .special-line {
-        grid-template-columns: 1fr 75px 100px;
+    .row-consommable {
+        grid-template-columns: 1fr;
+    }
+
+    .row-consommable .delete {
+        width: 100%;
+        height: 40px;
     }
 
     header h1 {
         font-size: 21px;
     }
 }
+
 </style>
 </head>
+
 
 <body>
 
 <header>
+
     <h1>💰 Gestion compte famille</h1>
+
 </header>
+
 
 <div class="container">
 
-    <!-- REVENUS -->
-    <div class="card">
-        <h2>💰 Revenus</h2>
 
-        <div id="revenus"></div>
+<!-- =========================
+     REVENUS
+========================= -->
 
-        <button class="add" onclick="ajouterLigne('revenus')">
-            ＋ Ajouter une ligne
-        </button>
+<div class="card">
 
-        <div class="total">
-            <span>Total</span>
-            <span id="total-revenus">0,00 €</span>
-        </div>
-    </div>
+    <h2>💰 Revenus</h2>
 
+    <div id="revenus"></div>
 
-    <!-- CHARGES -->
-    <div class="card">
-        <h2>🏠 Charges</h2>
+    <button
+        class="add"
+        onclick="ajouterLigne('revenus')"
+    >
+        ＋ Ajouter une ligne
+    </button>
 
-        <div id="charges"></div>
+    <div class="total">
 
-        <button class="add" onclick="ajouterLigne('charges')">
-            ＋ Ajouter une ligne
-        </button>
+        <span>Total</span>
 
-        <div class="total">
-            <span>Total</span>
-            <span id="total-charges">0,00 €</span>
-        </div>
-    </div>
+        <span id="total-revenus">
+            0,00 €
+        </span>
 
-
-    <!-- ABONNEMENTS -->
-    <div class="card">
-        <h2>📱 Abonnements</h2>
-
-        <div id="abonnements"></div>
-
-        <button class="add" onclick="ajouterLigne('abonnements')">
-            ＋ Ajouter une ligne
-        </button>
-
-        <div class="total">
-            <span>Total</span>
-            <span id="total-abonnements">0,00 €</span>
-        </div>
-    </div>
-
-
-    <!-- CONSOMMABLES -->
-    <div class="card">
-        <h2>🛒 Consommables</h2>
-
-        <div id="consommables"></div>
-
-        <button class="add" onclick="ajouterLigne('consommables')">
-            ＋ Ajouter une ligne
-        </button>
-
-        <div class="special">
-            <div class="special-line">
-                <strong>Faux frais</strong>
-
-                <input
-                    id="pourcentage-faux-frais"
-                    class="percent"
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    value="0"
-                    oninput="calculer()"
-                >
-
-                <input
-                    id="montant-faux-frais"
-                    class="amount"
-                    type="text"
-                    value="0,00 €"
-                    readonly
-                >
-            </div>
-
-            <div class="info">
-                Pourcentage des revenus utilisé pour calculer les faux frais.
-            </div>
-        </div>
-
-        <div class="total">
-            <span>Total</span>
-            <span id="total-consommables">0,00 €</span>
-        </div>
-    </div>
-
-
-    <!-- EPARGNE FIXE -->
-    <div class="card">
-        <h2>💶 Épargnes fixes</h2>
-
-        <div id="epargnes"></div>
-
-        <button class="add" onclick="ajouterLigne('epargnes')">
-            ＋ Ajouter une ligne
-        </button>
-
-        <div class="total">
-            <span>Total</span>
-            <span id="total-epargnes">0,00 €</span>
-        </div>
-    </div>
-
-
-    <!-- SOLDE -->
-    <div class="card">
-        <div class="total" style="border-top:0; margin-top:0;">
-            <span>💰 Reste du mois</span>
-            <span id="reste">0,00 €</span>
-        </div>
     </div>
 
 </div>
 
 
+
+<!-- =========================
+     CHARGES
+========================= -->
+
+<div class="card">
+
+    <h2>🏠 Charges</h2>
+
+    <div id="charges"></div>
+
+    <button
+        class="add"
+        onclick="ajouterLigne('charges')"
+    >
+        ＋ Ajouter une ligne
+    </button>
+
+    <div class="total">
+
+        <span>Total</span>
+
+        <span id="total-charges">
+            0,00 €
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     ABONNEMENTS
+========================= -->
+
+<div class="card">
+
+    <h2>📱 Abonnements</h2>
+
+    <div id="abonnements"></div>
+
+    <button
+        class="add"
+        onclick="ajouterLigne('abonnements')"
+    >
+        ＋ Ajouter une ligne
+    </button>
+
+    <div class="total">
+
+        <span>Total</span>
+
+        <span id="total-abonnements">
+            0,00 €
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     CONSOMMABLES
+========================= -->
+
+<div class="card">
+
+    <h2>🛒 Consommables</h2>
+
+    <div id="consommables"></div>
+
+    <button
+        class="add"
+        onclick="ajouterLigneConsommable()"
+    >
+        ＋ Ajouter une ligne
+    </button>
+
+    <div class="total">
+
+        <span>Total</span>
+
+        <span id="total-consommables">
+            0,00 €
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     AUTRES DEPENSES
+========================= -->
+
+<div class="card">
+
+    <h2>💸 Autres dépenses</h2>
+
+    <div id="autresDepenses"></div>
+
+    <button
+        class="add"
+        onclick="ajouterLigne('autresDepenses')"
+    >
+        ＋ Ajouter une ligne
+    </button>
+
+    <div class="total">
+
+        <span>Total</span>
+
+        <span id="total-autresDepenses">
+            0,00 €
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     EPARGNES
+========================= -->
+
+<div class="card">
+
+    <h2>💶 Épargnes fixes</h2>
+
+    <div id="epargnes"></div>
+
+    <button
+        class="add"
+        onclick="ajouterLigne('epargnes')"
+    >
+        ＋ Ajouter une ligne
+    </button>
+
+    <div class="total">
+
+        <span>Total</span>
+
+        <span id="total-epargnes">
+            0,00 €
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     RESTE
+========================= -->
+
+<div class="card">
+
+    <div
+        class="total"
+        style="border-top:0; margin-top:0;"
+    >
+
+        <span>💰 Reste du mois</span>
+
+        <span id="reste">
+            0,00 €
+        </span>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+
 <script>
 
+
+/* =========================
+   DONNEES DE DEPART
+========================= */
+
 const donnees = {
+
     revenus: [
-        { nom: "Salaire 1", montant: "" },
-        { nom: "Salaire 2", montant: "" }
+
+        {
+            nom: "Salaire 1",
+            montant: ""
+        },
+
+        {
+            nom: "Salaire 2",
+            montant: ""
+        }
+
     ],
 
     charges: [],
@@ -297,174 +396,483 @@ const donnees = {
 
     consommables: [],
 
+    autresDepenses: [],
+
     epargnes: []
+
 };
 
 
+
 /* =========================
-   AFFICHAGE
+   TYPES CONSOMMABLES
+========================= */
+
+const typesConsommables = [
+
+    "Carburant A",
+
+    "Carburant B",
+
+    "Course de la semaine",
+
+    "Complément course",
+
+    "Saisie manuelle"
+
+];
+
+
+
+/* =========================
+   AFFICHER CATEGORIE NORMALE
 ========================= */
 
 function afficherCategorie(categorie) {
 
-    const container = document.getElementById(categorie);
+    const container =
+        document.getElementById(categorie);
 
     container.innerHTML = "";
 
-    donnees[categorie].forEach((ligne, index) => {
 
-        const div = document.createElement("div");
-        div.className = "row";
+    donnees[categorie].forEach(
+        (ligne, index) => {
 
-        div.innerHTML = `
-            <input
-                type="text"
-                value="${ligne.nom}"
-                placeholder="Nom"
-                oninput="modifierNom('${categorie}', ${index}, this.value)"
-            >
+            const div =
+                document.createElement("div");
 
-            <input
-                type="number"
-                value="${ligne.montant}"
-                placeholder="0"
-                step="0.01"
-                oninput="modifierMontant('${categorie}', ${index}, this.value)"
-            >
+            div.className = "row";
 
-            <button
-                class="delete"
-                onclick="supprimerLigne('${categorie}', ${index})"
-            >
-                ×
-            </button>
-        `;
 
-        container.appendChild(div);
-    });
+            const nom =
+                document.createElement("input");
+
+            nom.type = "text";
+
+            nom.value = ligne.nom;
+
+            nom.placeholder = "Nom";
+
+            nom.oninput = function() {
+
+                donnees[categorie][index].nom =
+                    this.value;
+
+                calculer();
+
+            };
+
+
+            const montant =
+                document.createElement("input");
+
+            montant.type = "number";
+
+            montant.value = ligne.montant;
+
+            montant.placeholder = "Montant";
+
+            montant.step = "0.01";
+
+            montant.oninput = function() {
+
+                donnees[categorie][index].montant =
+                    this.value;
+
+                calculer();
+
+            };
+
+
+            const supprimer =
+                document.createElement("button");
+
+            supprimer.className = "delete";
+
+            supprimer.textContent = "×";
+
+            supprimer.onclick = function() {
+
+                donnees[categorie].splice(
+                    index,
+                    1
+                );
+
+                afficherTout();
+
+            };
+
+
+            div.appendChild(nom);
+
+            div.appendChild(montant);
+
+            div.appendChild(supprimer);
+
+            container.appendChild(div);
+
+        }
+    );
+
 }
 
 
+
 /* =========================
-   AJOUTER UNE LIGNE
+   CONSOMMABLES
+========================= */
+
+function afficherConsommables() {
+
+    const container =
+        document.getElementById(
+            "consommables"
+        );
+
+    container.innerHTML = "";
+
+
+    donnees.consommables.forEach(
+        (ligne, index) => {
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "row-consommable";
+
+
+            /* LISTE */
+
+            const select =
+                document.createElement("select");
+
+
+            typesConsommables.forEach(
+                type => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+                    option.value = type;
+
+                    option.textContent = type;
+
+                    select.appendChild(option);
+
+                }
+            );
+
+
+            select.value =
+                ligne.type ||
+                "Carburant A";
+
+
+            select.onchange = function() {
+
+                donnees.consommables[index].type =
+                    this.value;
+
+
+                if (
+                    this.value !==
+                    "Saisie manuelle"
+                ) {
+
+                    donnees.consommables[index].nom =
+                        this.value;
+
+                }
+
+                afficherConsommables();
+
+                calculer();
+
+            };
+
+
+            /* SAISIE MANUELLE */
+
+            const nom =
+                document.createElement("input");
+
+            nom.type = "text";
+
+            nom.placeholder =
+                "Nom de la dépense";
+
+            nom.value =
+                ligne.type ===
+                "Saisie manuelle"
+                    ? ligne.nom
+                    : "";
+
+
+            if (
+                ligne.type !==
+                "Saisie manuelle"
+            ) {
+
+                nom.style.display =
+                    "none";
+
+            }
+
+
+            nom.oninput = function() {
+
+                donnees.consommables[index].nom =
+                    this.value;
+
+                calculer();
+
+            };
+
+
+            /* MONTANT */
+
+            const montant =
+                document.createElement("input");
+
+            montant.type = "number";
+
+            montant.placeholder =
+                "Montant";
+
+            montant.step = "0.01";
+
+            montant.value =
+                ligne.montant || "";
+
+
+            montant.oninput = function() {
+
+                donnees.consommables[index].montant =
+                    this.value;
+
+                calculer();
+
+            };
+
+
+            /* SUPPRESSION */
+
+            const supprimer =
+                document.createElement("button");
+
+            supprimer.className =
+                "delete";
+
+            supprimer.textContent =
+                "×";
+
+
+            supprimer.onclick =
+                function() {
+
+                    donnees.consommables.splice(
+                        index,
+                        1
+                    );
+
+                    afficherTout();
+
+                };
+
+
+            div.appendChild(select);
+
+            div.appendChild(nom);
+
+            div.appendChild(montant);
+
+            div.appendChild(supprimer);
+
+            container.appendChild(div);
+
+        }
+    );
+
+}
+
+
+
+/* =========================
+   AJOUTER CONSOMMABLE
+========================= */
+
+function ajouterLigneConsommable() {
+
+    donnees.consommables.push({
+
+        type: "Carburant A",
+
+        nom: "Carburant A",
+
+        montant: ""
+
+    });
+
+    afficherTout();
+
+}
+
+
+
+/* =========================
+   AJOUTER LIGNE NORMALE
 ========================= */
 
 function ajouterLigne(categorie) {
 
     donnees[categorie].push({
+
         nom: "",
+
         montant: ""
+
     });
 
     afficherTout();
+
 }
 
 
-/* =========================
-   SUPPRIMER
-========================= */
-
-function supprimerLigne(categorie, index) {
-
-    donnees[categorie].splice(index, 1);
-
-    afficherTout();
-}
-
 
 /* =========================
-   MODIFICATION NOM
-========================= */
-
-function modifierNom(categorie, index, valeur) {
-
-    donnees[categorie][index].nom = valeur;
-
-    sauvegarder();
-}
-
-
-/* =========================
-   MODIFICATION MONTANT
-========================= */
-
-function modifierMontant(categorie, index, valeur) {
-
-    donnees[categorie][index].montant = valeur;
-
-    calculer();
-    sauvegarder();
-}
-
-
-/* =========================
-   CALCUL TOTAL
+   TOTAL
 ========================= */
 
 function totalCategorie(categorie) {
 
-    return donnees[categorie].reduce((total, ligne) => {
+    return donnees[categorie].reduce(
 
-        const montant = parseFloat(
-            String(ligne.montant).replace(",", ".")
-        );
+        (total, ligne) => {
 
-        return total + (isNaN(montant) ? 0 : montant);
+            const montant =
+                parseFloat(
+                    String(ligne.montant)
+                        .replace(",", ".")
+                );
 
-    }, 0);
+
+            return total +
+                (
+                    isNaN(montant)
+                        ? 0
+                        : montant
+                );
+
+        },
+
+        0
+
+    );
+
 }
 
 
+
 /* =========================
-   CALCUL GENERAL
+   CALCUL
 ========================= */
 
 function calculer() {
 
-    const revenus = totalCategorie("revenus");
-    const charges = totalCategorie("charges");
-    const abonnements = totalCategorie("abonnements");
-    const consommablesBase = totalCategorie("consommables");
-    const epargnes = totalCategorie("epargnes");
+    const revenus =
+        totalCategorie("revenus");
 
-    const pourcentage = parseFloat(
-        document.getElementById("pourcentage-faux-frais").value
-    ) || 0;
 
-    const fauxFrais = revenus * pourcentage / 100;
+    const charges =
+        totalCategorie("charges");
 
-    const consommables = consommablesBase + fauxFrais;
 
-    document.getElementById("montant-faux-frais").value =
-        formatEuro(fauxFrais);
+    const abonnements =
+        totalCategorie("abonnements");
 
-    document.getElementById("total-revenus").textContent =
+
+    const consommables =
+        totalCategorie("consommables");
+
+
+    const autresDepenses =
+        totalCategorie(
+            "autresDepenses"
+        );
+
+
+    const epargnes =
+        totalCategorie("epargnes");
+
+
+    document
+        .getElementById(
+            "total-revenus"
+        )
+        .textContent =
         formatEuro(revenus);
 
-    document.getElementById("total-charges").textContent =
+
+    document
+        .getElementById(
+            "total-charges"
+        )
+        .textContent =
         formatEuro(charges);
 
-    document.getElementById("total-abonnements").textContent =
+
+    document
+        .getElementById(
+            "total-abonnements"
+        )
+        .textContent =
         formatEuro(abonnements);
 
-    document.getElementById("total-consommables").textContent =
+
+    document
+        .getElementById(
+            "total-consommables"
+        )
+        .textContent =
         formatEuro(consommables);
 
-    document.getElementById("total-epargnes").textContent =
+
+    document
+        .getElementById(
+            "total-autresDepenses"
+        )
+        .textContent =
+        formatEuro(autresDepenses);
+
+
+    document
+        .getElementById(
+            "total-epargnes"
+        )
+        .textContent =
         formatEuro(epargnes);
+
 
     const reste =
         revenus
         - charges
         - abonnements
         - consommables
+        - autresDepenses
         - epargnes;
 
-    document.getElementById("reste").textContent =
+
+    document
+        .getElementById("reste")
+        .textContent =
         formatEuro(reste);
 
-    sauvegarder();
 }
+
 
 
 /* =========================
@@ -473,79 +881,21 @@ function calculer() {
 
 function formatEuro(nombre) {
 
-    return nombre.toLocaleString("fr-FR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    }) + " €";
-}
+    return nombre.toLocaleString(
 
+        "fr-FR",
 
-/* =========================
-   SAUVEGARDE LOCALE
-========================= */
+        {
+            minimumFractionDigits: 2,
 
-function sauvegarder() {
+            maximumFractionDigits: 2
 
-    const pourcentage =
-        document.getElementById("pourcentage-faux-frais").value;
-
-    localStorage.setItem(
-        "gestionCompteFamille",
-        JSON.stringify({
-            donnees: donnees,
-            pourcentage: pourcentage
-        })
-    );
-}
-
-
-/* =========================
-   CHARGEMENT
-========================= */
-
-function charger() {
-
-    const sauvegarde =
-        localStorage.getItem("gestionCompteFamille");
-
-    if (!sauvegarde) {
-        afficherTout();
-        return;
-    }
-
-    try {
-
-        const data = JSON.parse(sauvegarde);
-
-        if (data.donnees) {
-
-            Object.keys(donnees).forEach(categorie => {
-
-                if (Array.isArray(data.donnees[categorie])) {
-
-                    donnees[categorie] =
-                        data.donnees[categorie];
-
-                }
-
-            });
         }
 
-        if (data.pourcentage !== undefined) {
+    ) + " €";
 
-            document.getElementById(
-                "pourcentage-faux-frais"
-            ).value = data.pourcentage;
-        }
-
-    } catch (e) {
-
-        console.log("Erreur de chargement");
-
-    }
-
-    afficherTout();
 }
+
 
 
 /* =========================
@@ -555,20 +905,30 @@ function charger() {
 function afficherTout() {
 
     afficherCategorie("revenus");
+
     afficherCategorie("charges");
+
     afficherCategorie("abonnements");
-    afficherCategorie("consommables");
+
+    afficherConsommables();
+
+    afficherCategorie(
+        "autresDepenses"
+    );
+
     afficherCategorie("epargnes");
 
     calculer();
+
 }
+
 
 
 /* =========================
    DEMARRAGE
 ========================= */
 
-charger();
+afficherTout();
 
 </script>
 
