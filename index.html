@@ -1096,16 +1096,240 @@ const data = {
     ],
 
     charges: [],
-
     abonnements: [],
-
     consommables: [],
-
     autresDepenses: [],
-
     epargnes: []
 
 };
+
+
+/* =========================================================
+   SAUVEGARDE SUPABASE
+========================================================= */
+
+let budgetCharge = false;
+let sauvegardeTimer = null;
+let sauvegardeEnCours = false;
+
+
+/*
+ * Attend 500 ms après une modification avant de sauvegarder.
+ * Cela évite d'envoyer une requête à chaque caractère tapé.
+ */
+
+function programmerSauvegarde() {
+
+    if (!budgetCharge) {
+        return;
+    }
+
+    clearTimeout(sauvegardeTimer);
+
+    sauvegardeTimer = setTimeout(
+        sauvegarderBudget,
+        500
+    );
+
+}
+
+
+/*
+ * Enregistre tout le budget dans Supabase.
+ */
+
+async function sauvegarderBudget() {
+
+    if (!budgetCharge || sauvegardeEnCours) {
+        return;
+    }
+
+    sauvegardeEnCours = true;
+
+    try {
+
+        const { error } =
+            await supabaseClient
+                .from("budget_famille")
+                .upsert(
+                    {
+                        id: 1,
+                        donnees: data,
+                        updated_at:
+                            new Date().toISOString()
+                    },
+                    {
+                        onConflict: "id"
+                    }
+                );
+
+        if (error) {
+
+            console.error(
+                "Erreur sauvegarde :",
+                error
+            );
+
+        } else {
+
+            console.log(
+                "Budget sauvegardé."
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Erreur sauvegarde :",
+            error
+        );
+
+    } finally {
+
+        sauvegardeEnCours = false;
+
+    }
+
+}
+
+
+/*
+ * Récupère le budget déjà enregistré.
+ */
+
+async function chargerBudget() {
+
+    try {
+
+        const { data: result, error } =
+            await supabaseClient
+                .from("budget_famille")
+                .select("donnees")
+                .eq("id", 1)
+                .maybeSingle();
+
+
+        if (error) {
+
+            console.error(
+                "Erreur chargement budget :",
+                error
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * Si un budget existe déjà,
+         * on remplace les données locales.
+         */
+
+        if (
+            result &&
+            result.donnees
+        ) {
+
+            const sauvegarde =
+                result.donnees;
+
+
+            data.revenus =
+                Array.isArray(
+                    sauvegarde.revenus
+                )
+                ? sauvegarde.revenus
+                : [];
+
+
+            data.charges =
+                Array.isArray(
+                    sauvegarde.charges
+                )
+                ? sauvegarde.charges
+                : [];
+
+
+            data.abonnements =
+                Array.isArray(
+                    sauvegarde.abonnements
+                )
+                ? sauvegarde.abonnements
+                : [];
+
+
+            data.consommables =
+                Array.isArray(
+                    sauvegarde.consommables
+                )
+                ? sauvegarde.consommables
+                : [];
+
+
+            data.autresDepenses =
+                Array.isArray(
+                    sauvegarde.autresDepenses
+                )
+                ? sauvegarde.autresDepenses
+                : [];
+
+
+            data.epargnes =
+                Array.isArray(
+                    sauvegarde.epargnes
+                )
+                ? sauvegarde.epargnes
+                : [];
+
+        }
+
+
+        budgetCharge = true;
+
+
+        /*
+         * On réaffiche les données récupérées.
+         */
+
+        renderLines("revenus");
+        renderLines("charges");
+        renderLines("abonnements");
+        renderConsumables();
+        renderLines("autresDepenses");
+        renderLines("epargnes");
+
+        update();
+
+
+        /*
+         * Si aucune donnée n'existe encore,
+         * on crée la première sauvegarde.
+         */
+
+        if (!result) {
+
+            await sauvegarderBudget();
+
+        }
+
+
+        console.log(
+            "Budget chargé depuis Supabase."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur chargement :",
+            error
+        );
+
+    }
+
+}
 
 
 /* =========================================================
@@ -1114,13 +1338,14 @@ const data = {
 
 function euro(value) {
 
-    return Number(value || 0).toLocaleString(
-        "fr-FR",
-        {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }
-    ) + " €";
+    return Number(value || 0)
+        .toLocaleString(
+            "fr-FR",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        ) + " €";
 
 }
 
@@ -1149,7 +1374,8 @@ function total(category) {
 
     return data[category].reduce(
         (sum, line) =>
-            sum + (Number(line.montant) || 0),
+            sum +
+            (Number(line.montant) || 0),
         0
     );
 
@@ -1157,7 +1383,7 @@ function total(category) {
 
 
 /* =========================================================
-   AFFICHAGE LIGNES
+   LIGNES CLASSIQUES
 ========================================================= */
 
 function renderLines(category) {
@@ -1191,7 +1417,8 @@ function renderLines(category) {
                         placeholder="Nom"
                         oninput="
                             data.${category}[${index}].nom =
-                            this.value
+                            this.value;
+                            programmerSauvegarde();
                         "
                     >
 
@@ -1205,6 +1432,7 @@ function renderLines(category) {
                             data.${category}[${index}].montant =
                             Number(this.value) || 0;
                             update();
+                            programmerSauvegarde();
                         "
                     >
 
@@ -1229,7 +1457,7 @@ function renderLines(category) {
 
 
 /* =========================================================
-   AFFICHAGE CONSOMMABLES
+   CONSOMMABLES
 ========================================================= */
 
 function renderConsumables() {
@@ -1275,45 +1503,59 @@ function renderConsumables() {
 
                             <option
                                 value="Carburant A"
-                                ${line.type === "Carburant A"
+                                ${
+                                    line.type ===
+                                    "Carburant A"
                                     ? "selected"
-                                    : ""}
+                                    : ""
+                                }
                             >
                                 Carburant A
                             </option>
 
                             <option
                                 value="Carburant B"
-                                ${line.type === "Carburant B"
+                                ${
+                                    line.type ===
+                                    "Carburant B"
                                     ? "selected"
-                                    : ""}
+                                    : ""
+                                }
                             >
                                 Carburant B
                             </option>
 
                             <option
                                 value="Course de la semaine"
-                                ${line.type === "Course de la semaine"
+                                ${
+                                    line.type ===
+                                    "Course de la semaine"
                                     ? "selected"
-                                    : ""}
+                                    : ""
+                                }
                             >
                                 Course de la semaine
                             </option>
 
                             <option
                                 value="Complément course"
-                                ${line.type === "Complément course"
+                                ${
+                                    line.type ===
+                                    "Complément course"
                                     ? "selected"
-                                    : ""}
+                                    : ""
+                                }
                             >
                                 Complément course
                             </option>
 
                             <option
                                 value="manuel"
-                                ${manual
+                                ${
+                                    manual
                                     ? "selected"
-                                    : ""}
+                                    : ""
+                                }
                             >
                                 Saisie manuelle
                             </option>
@@ -1334,7 +1576,8 @@ function renderConsumables() {
                                         data.consommables[
                                             ${index}
                                         ].nom =
-                                        this.value
+                                        this.value;
+                                        programmerSauvegarde();
                                     "
                                 >
                             `
@@ -1356,6 +1599,7 @@ function renderConsumables() {
                                 ].montant =
                                 Number(this.value) || 0;
                                 update();
+                                programmerSauvegarde();
                             "
                         >
 
@@ -1390,14 +1634,16 @@ function addLine(category) {
     data[category].push({
 
         nom: "",
-
         montant: 0
 
     });
 
+
     renderLines(category);
 
     update();
+
+    programmerSauvegarde();
 
 }
 
@@ -1407,16 +1653,17 @@ function addConsumable() {
     data.consommables.push({
 
         type: "Carburant A",
-
         nom: "",
-
         montant: 0
 
     });
 
+
     renderConsumables();
 
     update();
+
+    programmerSauvegarde();
 
 }
 
@@ -1435,9 +1682,12 @@ function deleteLine(
         1
     );
 
+
     renderLines(category);
 
     update();
+
+    programmerSauvegarde();
 
 }
 
@@ -1449,9 +1699,12 @@ function deleteConsumable(index) {
         1
     );
 
+
     renderConsumables();
 
     update();
+
+    programmerSauvegarde();
 
 }
 
@@ -1480,6 +1733,8 @@ function changeConsumableType(
     renderConsumables();
 
     update();
+
+    programmerSauvegarde();
 
 }
 
@@ -1518,7 +1773,8 @@ function updateConsumableRecap() {
 
             }
             else if (
-                line.type === "Course de la semaine"
+                line.type ===
+                "Course de la semaine"
             ) {
 
                 course += amount;
@@ -1575,11 +1831,13 @@ function updateConsumableRecap() {
 
                 const percent =
                     totalConsumables > 0
-                    ? (
+                    ?
+                    (
                         row[1] /
                         totalConsumables
                     ) * 100
-                    : 0;
+                    :
+                    0;
 
 
                 return `
@@ -1620,9 +1878,11 @@ function updateConsumableRecap() {
                 </th>
 
                 <th>
-                    ${totalConsumables > 0
+                    ${
+                        totalConsumables > 0
                         ? "100,0"
-                        : "0,0"} %
+                        : "0,0"
+                    } %
                 </th>
 
             </tr>
@@ -1679,11 +1939,13 @@ function updateOtherExpensesRecap() {
 
                 const percent =
                     totalExpenses > 0
-                    ? (
+                    ?
+                    (
                         amount /
                         totalExpenses
                     ) * 100
-                    : 0;
+                    :
+                    0;
 
 
                 return `
@@ -1758,7 +2020,8 @@ function updateChart() {
 
             }
             else if (
-                line.type === "Course de la semaine"
+                line.type ===
+                "Course de la semaine"
             ) {
 
                 course += amount;
@@ -1881,7 +2144,9 @@ function updateChart() {
             if (
                 category.value <= 0
             ) {
+
                 return;
+
             }
 
 
@@ -2140,6 +2405,7 @@ loginForm.addEventListener(
             error.style.display =
                 "block";
 
+
             button.disabled = false;
 
             button.textContent =
@@ -2194,6 +2460,17 @@ function showApp(session) {
 
     }
 
+
+    /*
+     * Chargement du budget depuis Supabase.
+     */
+
+    if (!budgetCharge) {
+
+        chargerBudget();
+
+    }
+
 }
 
 
@@ -2204,6 +2481,9 @@ function showApp(session) {
 async function logout() {
 
     await supabaseClient.auth.signOut();
+
+
+    budgetCharge = false;
 
 
     document.getElementById(
