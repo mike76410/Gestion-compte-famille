@@ -115,11 +115,199 @@ button {
     font-size: 17px;
 }
 
-.manual-hidden {
-    display: none;
+
+/* =========================
+   RECAPITULATIFS
+========================= */
+
+.recap-card {
+    background: white;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
 }
 
-@media (max-width: 600px) {
+.recap-card h2 {
+    margin: 0 0 18px;
+    font-size: 20px;
+}
+
+.recap-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 25px;
+    align-items: center;
+}
+
+
+/* =========================
+   DIAGRAMME CIRCULAIRE
+========================= */
+
+.pie-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pie-chart {
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: conic-gradient(#e5e7eb 0deg 360deg);
+    position: relative;
+    transition: background 0.3s ease;
+}
+
+.pie-chart::after {
+    content: "";
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    background: white;
+    border-radius: 50%;
+    top: 65px;
+    left: 65px;
+}
+
+.pie-center {
+    position: absolute;
+    z-index: 2;
+    width: 130px;
+    height: 130px;
+    top: 65px;
+    left: 65px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.pie-center strong {
+    font-size: 20px;
+}
+
+.pie-center span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+
+/* =========================
+   LEGENDES
+========================= */
+
+.legend {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.legend-item {
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    font-size: 14px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legend-name {
+    font-weight: 500;
+}
+
+.legend-value {
+    font-weight: bold;
+}
+
+.legend-percent {
+    color: #64748b;
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+
+/* =========================
+   TABLEAUX DE RECAP
+========================= */
+
+.recap-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.recap-line {
+    display: grid;
+    grid-template-columns: 1fr 100px 80px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eef0f3;
+}
+
+.recap-line:last-child {
+    border-bottom: 0;
+}
+
+.recap-name {
+    font-weight: 500;
+}
+
+.recap-amount {
+    text-align: right;
+    font-weight: bold;
+}
+
+.recap-percent {
+    text-align: right;
+    color: #64748b;
+}
+
+.recap-total {
+    border-top: 2px solid #e5e7eb;
+    margin-top: 8px;
+    padding-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 100px 80px;
+    gap: 10px;
+    font-weight: bold;
+}
+
+.empty-recap {
+    color: #64748b;
+    font-size: 14px;
+    padding: 8px 0;
+}
+
+
+/* =========================
+   AVERTISSEMENT
+========================= */
+
+.warning {
+    display: none;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #fff7ed;
+    color: #9a3412;
+    font-size: 14px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
 
     .row {
         grid-template-columns: 1fr 90px 38px;
@@ -134,6 +322,37 @@ button {
         height: 40px;
     }
 
+    .recap-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .pie-chart {
+        width: 230px;
+        height: 230px;
+    }
+
+    .pie-chart::after {
+        width: 115px;
+        height: 115px;
+        top: 57.5px;
+        left: 57.5px;
+    }
+
+    .pie-center {
+        width: 115px;
+        height: 115px;
+        top: 57.5px;
+        left: 57.5px;
+    }
+
+    .recap-line {
+        grid-template-columns: 1fr 90px 65px;
+    }
+
+    .recap-total {
+        grid-template-columns: 1fr 90px 65px;
+    }
+
     header h1 {
         font-size: 21px;
     }
@@ -144,6 +363,7 @@ button {
 
 
 <body>
+
 
 <header>
 
@@ -363,6 +583,98 @@ button {
 </div>
 
 
+
+<!-- =========================
+     REPARTITION DU BUDGET
+========================= -->
+
+<div class="recap-card">
+
+    <h2>📊 Répartition du budget</h2>
+
+    <div class="recap-layout">
+
+
+        <!-- DIAGRAMME -->
+
+        <div class="pie-container">
+
+            <div
+                class="pie-chart"
+                id="budgetPie"
+            >
+
+                <div class="pie-center">
+
+                    <strong id="pieRevenus">
+                        0 €
+                    </strong>
+
+                    <span>
+                        Revenus
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- LEGENDE -->
+
+        <div
+            class="legend"
+            id="budgetLegend"
+        ></div>
+
+    </div>
+
+
+    <div
+        class="warning"
+        id="budgetWarning"
+    >
+        ⚠️ Les dépenses dépassent les revenus.
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     RECAP CONSOMMABLES
+========================= -->
+
+<div class="recap-card">
+
+    <h2>🛒 Répartition des consommables</h2>
+
+    <div
+        class="recap-list"
+        id="recapConsommables"
+    ></div>
+
+</div>
+
+
+
+<!-- =========================
+     RECAP AUTRES DEPENSES
+========================= -->
+
+<div class="recap-card">
+
+    <h2>💸 Répartition des autres dépenses</h2>
+
+    <div
+        class="recap-list"
+        id="recapAutresDepenses"
+    ></div>
+
+</div>
+
+
 </div>
 
 
@@ -371,7 +683,7 @@ button {
 
 
 /* =========================
-   DONNEES DE DEPART
+   DONNEES
 ========================= */
 
 const donnees = {
@@ -425,7 +737,82 @@ const typesConsommables = [
 
 
 /* =========================
-   AFFICHER CATEGORIE NORMALE
+   COULEURS DU GRAPHIQUE
+========================= */
+
+const couleursBudget = [
+
+    "#6366f1",
+    "#f59e0b",
+    "#10b981",
+    "#ef4444",
+    "#8b5cf6",
+    "#94a3b8"
+
+];
+
+
+
+/* =========================
+   FORMAT EURO
+========================= */
+
+function formatEuro(nombre) {
+
+    return nombre.toLocaleString(
+
+        "fr-FR",
+
+        {
+            minimumFractionDigits: 2,
+
+            maximumFractionDigits: 2
+
+        }
+
+    ) + " €";
+
+}
+
+
+
+/* =========================
+   TOTAL CATEGORIE
+========================= */
+
+function totalCategorie(categorie) {
+
+    return donnees[categorie].reduce(
+
+        (total, ligne) => {
+
+            const montant =
+                parseFloat(
+                    String(ligne.montant)
+                        .replace(",", ".")
+                );
+
+
+            return total +
+
+                (
+                    isNaN(montant)
+                        ? 0
+                        : montant
+                );
+
+        },
+
+        0
+
+    );
+
+}
+
+
+
+/* =========================
+   AFFICHER CATEGORIE
 ========================= */
 
 function afficherCategorie(categorie) {
@@ -437,6 +824,7 @@ function afficherCategorie(categorie) {
 
 
     donnees[categorie].forEach(
+
         (ligne, index) => {
 
             const div =
@@ -453,6 +841,7 @@ function afficherCategorie(categorie) {
             nom.value = ligne.nom;
 
             nom.placeholder = "Nom";
+
 
             nom.oninput = function() {
 
@@ -475,6 +864,7 @@ function afficherCategorie(categorie) {
 
             montant.step = "0.01";
 
+
             montant.oninput = function() {
 
                 donnees[categorie][index].montant =
@@ -491,6 +881,7 @@ function afficherCategorie(categorie) {
             supprimer.className = "delete";
 
             supprimer.textContent = "×";
+
 
             supprimer.onclick = function() {
 
@@ -513,6 +904,7 @@ function afficherCategorie(categorie) {
             container.appendChild(div);
 
         }
+
     );
 
 }
@@ -520,7 +912,7 @@ function afficherCategorie(categorie) {
 
 
 /* =========================
-   CONSOMMABLES
+   AFFICHER CONSOMMABLES
 ========================= */
 
 function afficherConsommables() {
@@ -534,6 +926,7 @@ function afficherConsommables() {
 
 
     donnees.consommables.forEach(
+
         (ligne, index) => {
 
             const div =
@@ -543,13 +936,12 @@ function afficherConsommables() {
                 "row-consommable";
 
 
-            /* LISTE */
-
             const select =
                 document.createElement("select");
 
 
             typesConsommables.forEach(
+
                 type => {
 
                     const option =
@@ -564,6 +956,7 @@ function afficherConsommables() {
                     select.appendChild(option);
 
                 }
+
             );
 
 
@@ -572,30 +965,34 @@ function afficherConsommables() {
                 "Carburant A";
 
 
-            select.onchange = function() {
+            select.onchange =
+                function() {
 
-                donnees.consommables[index].type =
-                    this.value;
-
-
-                if (
-                    this.value !==
-                    "Saisie manuelle"
-                ) {
-
-                    donnees.consommables[index].nom =
+                    donnees
+                        .consommables[index]
+                        .type =
                         this.value;
 
-                }
 
-                afficherConsommables();
+                    if (
+                        this.value !==
+                        "Saisie manuelle"
+                    ) {
 
-                calculer();
+                        donnees
+                            .consommables[index]
+                            .nom =
+                            this.value;
 
-            };
+                    }
 
 
-            /* SAISIE MANUELLE */
+                    afficherConsommables();
+
+                    calculer();
+
+                };
+
 
             const nom =
                 document.createElement("input");
@@ -605,17 +1002,19 @@ function afficherConsommables() {
             nom.placeholder =
                 "Nom de la dépense";
 
-            nom.value =
-                ligne.type ===
-                "Saisie manuelle"
-                    ? ligne.nom
-                    : "";
-
 
             if (
-                ligne.type !==
+                ligne.type ===
                 "Saisie manuelle"
             ) {
+
+                nom.value =
+                    ligne.nom || "";
+
+                nom.style.display =
+                    "block";
+
+            } else {
 
                 nom.style.display =
                     "none";
@@ -625,15 +1024,15 @@ function afficherConsommables() {
 
             nom.oninput = function() {
 
-                donnees.consommables[index].nom =
+                donnees
+                    .consommables[index]
+                    .nom =
                     this.value;
 
                 calculer();
 
             };
 
-
-            /* MONTANT */
 
             const montant =
                 document.createElement("input");
@@ -651,15 +1050,15 @@ function afficherConsommables() {
 
             montant.oninput = function() {
 
-                donnees.consommables[index].montant =
+                donnees
+                    .consommables[index]
+                    .montant =
                     this.value;
 
                 calculer();
 
             };
 
-
-            /* SUPPRESSION */
 
             const supprimer =
                 document.createElement("button");
@@ -674,10 +1073,12 @@ function afficherConsommables() {
             supprimer.onclick =
                 function() {
 
-                    donnees.consommables.splice(
-                        index,
-                        1
-                    );
+                    donnees
+                        .consommables
+                        .splice(
+                            index,
+                            1
+                        );
 
                     afficherTout();
 
@@ -695,6 +1096,7 @@ function afficherConsommables() {
             container.appendChild(div);
 
         }
+
     );
 
 }
@@ -724,7 +1126,7 @@ function ajouterLigneConsommable() {
 
 
 /* =========================
-   AJOUTER LIGNE NORMALE
+   AJOUTER LIGNE
 ========================= */
 
 function ajouterLigne(categorie) {
@@ -744,41 +1146,7 @@ function ajouterLigne(categorie) {
 
 
 /* =========================
-   TOTAL
-========================= */
-
-function totalCategorie(categorie) {
-
-    return donnees[categorie].reduce(
-
-        (total, ligne) => {
-
-            const montant =
-                parseFloat(
-                    String(ligne.montant)
-                        .replace(",", ".")
-                );
-
-
-            return total +
-                (
-                    isNaN(montant)
-                        ? 0
-                        : montant
-                );
-
-        },
-
-        0
-
-    );
-
-}
-
-
-
-/* =========================
-   CALCUL
+   CALCUL GENERAL
 ========================= */
 
 function calculer() {
@@ -871,28 +1239,717 @@ function calculer() {
         .textContent =
         formatEuro(reste);
 
+
+    mettreAJourGraphique(
+
+        revenus,
+
+        charges,
+
+        abonnements,
+
+        consommables,
+
+        autresDepenses,
+
+        epargnes,
+
+        reste
+
+    );
+
+
+    mettreAJourRecapConsommables(
+        consommables
+    );
+
+
+    mettreAJourRecapAutresDepenses(
+        autresDepenses
+    );
+
 }
 
 
 
 /* =========================
-   FORMAT EURO
+   GRAPHIQUE PRINCIPAL
 ========================= */
 
-function formatEuro(nombre) {
+function mettreAJourGraphique(
 
-    return nombre.toLocaleString(
+    revenus,
+    charges,
+    abonnements,
+    consommables,
+    autresDepenses,
+    epargnes,
+    reste
 
-        "fr-FR",
+) {
+
+    const pie =
+        document.getElementById(
+            "budgetPie"
+        );
+
+
+    const legend =
+        document.getElementById(
+            "budgetLegend"
+        );
+
+
+    const warning =
+        document.getElementById(
+            "budgetWarning"
+        );
+
+
+    document
+        .getElementById(
+            "pieRevenus"
+        )
+        .textContent =
+        formatEuro(revenus);
+
+
+    legend.innerHTML = "";
+
+
+    if (revenus <= 0) {
+
+        pie.style.background =
+            "conic-gradient(#e5e7eb 0deg 360deg)";
+
+
+        ajouterLegende(
+            legend,
+            "Aucun revenu saisi",
+            0,
+            0,
+            "#e5e7eb"
+        );
+
+
+        warning.style.display = "none";
+
+        return;
+
+    }
+
+
+    const depensesTotales =
+
+        charges
+        + abonnements
+        + consommables
+        + autresDepenses
+        + epargnes;
+
+
+    const depassement =
+        depensesTotales > revenus;
+
+
+    warning.style.display =
+        depassement
+            ? "block"
+            : "none";
+
+
+    const restePositif =
+        Math.max(
+            0,
+            reste
+        );
+
+
+    const elements = [
 
         {
-            minimumFractionDigits: 2,
+            nom: "Charges",
+            montant: charges,
+            couleur: couleursBudget[0]
+        },
 
-            maximumFractionDigits: 2
+        {
+            nom: "Abonnements",
+            montant: abonnements,
+            couleur: couleursBudget[1]
+        },
+
+        {
+            nom: "Consommables",
+            montant: consommables,
+            couleur: couleursBudget[2]
+        },
+
+        {
+            nom: "Autres dépenses",
+            montant: autresDepenses,
+            couleur: couleursBudget[3]
+        },
+
+        {
+            nom: "Épargnes fixes",
+            montant: epargnes,
+            couleur: couleursBudget[4]
+        },
+
+        {
+            nom: "Reste du mois",
+            montant: restePositif,
+            couleur: couleursBudget[5]
+        }
+
+    ];
+
+
+    let angle = 0;
+
+    const gradients = [];
+
+
+    elements.forEach(
+
+        element => {
+
+            const pourcentage =
+                (
+                    element.montant /
+                    revenus
+                ) * 100;
+
+
+            const angleDebut =
+                angle;
+
+
+            const angleFin =
+                angle +
+                (
+                    pourcentage *
+                    3.6
+                );
+
+
+            if (
+                element.montant > 0
+            ) {
+
+                gradients.push(
+
+                    `${element.couleur} ${angleDebut}deg ${angleFin}deg`
+
+                );
+
+            }
+
+
+            angle = angleFin;
+
+
+            ajouterLegende(
+
+                legend,
+
+                element.nom,
+
+                element.montant,
+
+                pourcentage,
+
+                element.couleur
+
+            );
 
         }
 
-    ) + " €";
+    );
+
+
+    if (
+        gradients.length === 0
+    ) {
+
+        gradients.push(
+            "#e5e7eb 0deg 360deg"
+        );
+
+    }
+
+
+    pie.style.background =
+        `conic-gradient(${gradients.join(", ")})`;
+
+}
+
+
+
+/* =========================
+   AJOUTER UNE LIGNE LEGENDE
+========================= */
+
+function ajouterLegende(
+
+    container,
+    nom,
+    montant,
+    pourcentage,
+    couleur
+
+) {
+
+    const ligne =
+        document.createElement("div");
+
+    ligne.className =
+        "legend-item";
+
+
+    const couleurElement =
+        document.createElement("div");
+
+    couleurElement.className =
+        "legend-color";
+
+    couleurElement.style.background =
+        couleur;
+
+
+    const nomElement =
+        document.createElement("div");
+
+    nomElement.className =
+        "legend-name";
+
+    nomElement.textContent =
+        nom;
+
+
+    const valeurElement =
+        document.createElement("div");
+
+    valeurElement.className =
+        "legend-value";
+
+    valeurElement.textContent =
+        formatEuro(montant);
+
+
+    const pourcentageElement =
+        document.createElement("span");
+
+    pourcentageElement.className =
+        "legend-percent";
+
+    pourcentageElement.textContent =
+        `${pourcentage.toFixed(1)} %`;
+
+
+    valeurElement.appendChild(
+        pourcentageElement
+    );
+
+
+    ligne.appendChild(
+        couleurElement
+    );
+
+    ligne.appendChild(
+        nomElement
+    );
+
+    ligne.appendChild(
+        valeurElement
+    );
+
+
+    container.appendChild(ligne);
+
+}
+
+
+
+/* =========================
+   RECAP CONSOMMABLES
+========================= */
+
+function mettreAJourRecapConsommables(
+    total
+) {
+
+    const container =
+        document.getElementById(
+            "recapConsommables"
+        );
+
+
+    container.innerHTML = "";
+
+
+    const regroupement = {
+
+        "Carburant A": 0,
+
+        "Carburant B": 0,
+
+        "Course de la semaine": 0,
+
+        "Complément course": 0,
+
+        "Autres consommables": 0
+
+    };
+
+
+    donnees.consommables.forEach(
+
+        ligne => {
+
+            const montant =
+                parseFloat(
+                    String(ligne.montant)
+                        .replace(",", ".")
+                ) || 0;
+
+
+            if (
+                ligne.type ===
+                "Saisie manuelle"
+            ) {
+
+                regroupement[
+                    "Autres consommables"
+                ] += montant;
+
+            }
+
+            else if (
+                regroupement[
+                    ligne.type
+                ] !== undefined
+            ) {
+
+                regroupement[
+                    ligne.type
+                ] += montant;
+
+            }
+
+        }
+
+    );
+
+
+    Object.entries(
+        regroupement
+    ).forEach(
+
+        ([nom, montant]) => {
+
+            if (montant === 0) {
+                return;
+            }
+
+
+            const pourcentage =
+                total > 0
+                    ? (
+                        montant /
+                        total
+                    ) * 100
+                    : 0;
+
+
+            ajouterLigneRecap(
+
+                container,
+
+                nom,
+
+                montant,
+
+                pourcentage
+
+            );
+
+        }
+
+    );
+
+
+    if (
+        total === 0
+    ) {
+
+        const vide =
+            document.createElement(
+                "div"
+            );
+
+        vide.className =
+            "empty-recap";
+
+        vide.textContent =
+            "Aucun consommable saisi.";
+
+        container.appendChild(vide);
+
+        return;
+
+    }
+
+
+    ajouterTotalRecap(
+
+        container,
+
+        total
+
+    );
+
+}
+
+
+
+/* =========================
+   RECAP AUTRES DEPENSES
+========================= */
+
+function mettreAJourRecapAutresDepenses(
+    total
+) {
+
+    const container =
+        document.getElementById(
+            "recapAutresDepenses"
+        );
+
+
+    container.innerHTML = "";
+
+
+    if (
+        total === 0
+    ) {
+
+        const vide =
+            document.createElement(
+                "div"
+            );
+
+        vide.className =
+            "empty-recap";
+
+        vide.textContent =
+            "Aucune autre dépense saisie.";
+
+        container.appendChild(vide);
+
+        return;
+
+    }
+
+
+    donnees.autresDepenses.forEach(
+
+        ligne => {
+
+            const montant =
+                parseFloat(
+                    String(ligne.montant)
+                        .replace(",", ".")
+                ) || 0;
+
+
+            if (
+                montant === 0
+            ) {
+                return;
+            }
+
+
+            const pourcentage =
+                (
+                    montant /
+                    total
+                ) * 100;
+
+
+            ajouterLigneRecap(
+
+                container,
+
+                ligne.nom ||
+                    "Dépense sans nom",
+
+                montant,
+
+                pourcentage
+
+            );
+
+        }
+
+    );
+
+
+    ajouterTotalRecap(
+
+        container,
+
+        total
+
+    );
+
+}
+
+
+
+/* =========================
+   LIGNE RECAP
+========================= */
+
+function ajouterLigneRecap(
+
+    container,
+    nom,
+    montant,
+    pourcentage
+
+) {
+
+    const ligne =
+        document.createElement(
+            "div"
+        );
+
+    ligne.className =
+        "recap-line";
+
+
+    const nomElement =
+        document.createElement(
+            "div"
+        );
+
+    nomElement.className =
+        "recap-name";
+
+    nomElement.textContent =
+        nom;
+
+
+    const montantElement =
+        document.createElement(
+            "div"
+        );
+
+    montantElement.className =
+        "recap-amount";
+
+    montantElement.textContent =
+        formatEuro(montant);
+
+
+    const pourcentageElement =
+        document.createElement(
+            "div"
+        );
+
+    pourcentageElement.className =
+        "recap-percent";
+
+    pourcentageElement.textContent =
+        `${pourcentage.toFixed(1)} %`;
+
+
+    ligne.appendChild(
+        nomElement
+    );
+
+    ligne.appendChild(
+        montantElement
+    );
+
+    ligne.appendChild(
+        pourcentageElement
+    );
+
+
+    container.appendChild(
+        ligne
+    );
+
+}
+
+
+
+/* =========================
+   TOTAL RECAP
+========================= */
+
+function ajouterTotalRecap(
+
+    container,
+    total
+
+) {
+
+    const ligne =
+        document.createElement(
+            "div"
+        );
+
+    ligne.className =
+        "recap-total";
+
+
+    const nom =
+        document.createElement(
+            "div"
+        );
+
+    nom.textContent =
+        "Total";
+
+
+    const montant =
+        document.createElement(
+            "div"
+        );
+
+    montant.style.textAlign =
+        "right";
+
+    montant.textContent =
+        formatEuro(total);
+
+
+    const pourcentage =
+        document.createElement(
+            "div"
+        );
+
+    pourcentage.style.textAlign =
+        "right";
+
+    pourcentage.textContent =
+        "100 %";
+
+
+    ligne.appendChild(nom);
+
+    ligne.appendChild(montant);
+
+    ligne.appendChild(pourcentage);
+
+
+    container.appendChild(
+        ligne
+    );
 
 }
 
@@ -904,11 +1961,17 @@ function formatEuro(nombre) {
 
 function afficherTout() {
 
-    afficherCategorie("revenus");
+    afficherCategorie(
+        "revenus"
+    );
 
-    afficherCategorie("charges");
+    afficherCategorie(
+        "charges"
+    );
 
-    afficherCategorie("abonnements");
+    afficherCategorie(
+        "abonnements"
+    );
 
     afficherConsommables();
 
@@ -916,7 +1979,9 @@ function afficherTout() {
         "autresDepenses"
     );
 
-    afficherCategorie("epargnes");
+    afficherCategorie(
+        "epargnes"
+    );
 
     calculer();
 
