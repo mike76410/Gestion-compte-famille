@@ -953,6 +953,8 @@ select:focus {
 
             </div>
 
+            <div id="autresDepensesBudget"></div>
+
             <div id="autresDepenses"></div>
 
             <button
@@ -1212,7 +1214,7 @@ const data = {
         "Carburant A": null,
         "Carburant B": null,
         "Course de la semaine": null,
-        "Autres consommables": null
+        "Autres dépenses": null
     }
 
 };
@@ -1398,12 +1400,23 @@ async function chargerBudget() {
                 : [];
 
 
+            const anciensBudgets =
+                sauvegarde.budgets || {};
+
             data.budgets = {
-                "Carburant A": null,
-                "Carburant B": null,
-                "Course de la semaine": null,
-                "Autres consommables": null,
-                ...(sauvegarde.budgets || {})
+                "Carburant A":
+                    anciensBudgets["Carburant A"] ?? null,
+
+                "Carburant B":
+                    anciensBudgets["Carburant B"] ?? null,
+
+                "Course de la semaine":
+                    anciensBudgets["Course de la semaine"] ?? null,
+
+                "Autres dépenses":
+                    anciensBudgets["Autres dépenses"] ??
+                    anciensBudgets["Autres consommables"] ??
+                    null
             };
 
         }
@@ -1420,6 +1433,7 @@ async function chargerBudget() {
         renderLines("charges");
         renderLines("abonnements");
         renderConsumables();
+        renderOtherExpensesBudget();
         renderLines("autresDepenses");
         renderLines("epargnes");
 
@@ -1601,11 +1615,6 @@ function getConsumableGroups() {
             key: "Course de la semaine",
             label: "🛒 Course de la semaine"
         },
-
-        {
-            key: "Autres consommables",
-            label: "🛒 Autres consommables"
-        }
 
     ];
 
@@ -2023,6 +2032,264 @@ function updateConsumableBudgetSummary() {
 
 
 /* =========================================================
+   BUDGET AUTRES DEPENSES
+========================================================= */
+
+function getOtherExpensesBudget() {
+
+    const value =
+        data.budgets &&
+        data.budgets["Autres dépenses"];
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return null;
+    }
+
+    const number = Number(value);
+
+    return Number.isFinite(number)
+        ? Math.max(number, 0)
+        : null;
+
+}
+
+
+function getOtherExpensesReserved() {
+
+    const spent =
+        total("autresDepenses");
+
+    const budget =
+        getOtherExpensesBudget();
+
+    if (budget === null) {
+        return spent;
+    }
+
+    return Math.max(
+        budget,
+        spent
+    );
+
+}
+
+
+function renderOtherExpensesBudget() {
+
+    const container =
+        document.getElementById(
+            "autresDepensesBudget"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    const budget =
+        getOtherExpensesBudget();
+
+    const spent =
+        total("autresDepenses");
+
+    const remaining =
+        budget === null
+        ? null
+        : budget - spent;
+
+    container.innerHTML = `
+
+        <div class="consumable-budget-summary">
+
+            <div class="consumable-budget-line">
+
+                <span class="consumable-budget-name">
+                    💳 Autres dépenses
+                </span>
+
+                <span class="consumable-budget-item">
+
+                    Budget :
+
+                    <input
+                        class="budget-input"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="${
+                            budget === null
+                            ? ""
+                            : budget
+                        }"
+                        placeholder="Budget"
+                        oninput="
+                            setOtherExpensesBudget(
+                                this.value
+                            )
+                        "
+                    >
+
+                </span>
+
+                <span class="consumable-budget-item">
+
+                    Dépensé :
+
+                    <strong id="other-expenses-spent">
+                        ${euro(spent)}
+                    </strong>
+
+                </span>
+
+                <span
+                    class="
+                        consumable-budget-item
+                        consumable-budget-remaining
+                    "
+                    id="other-expenses-remaining"
+                >
+
+                    Reste :
+
+                    <strong>
+                        ${
+                            remaining === null
+                            ? "—"
+                            : euro(remaining)
+                        }
+                    </strong>
+
+                </span>
+
+            </div>
+
+            <div
+                class="consumable-budget-warning"
+                id="other-expenses-warning"
+            ></div>
+
+        </div>
+
+    `;
+
+    updateOtherExpensesBudgetSummary();
+
+}
+
+
+function setOtherExpensesBudget(value) {
+
+    if (!data.budgets) {
+        data.budgets = {};
+    }
+
+    if (value === "") {
+
+        data.budgets["Autres dépenses"] =
+            null;
+
+    }
+    else {
+
+        data.budgets["Autres dépenses"] =
+            Math.max(
+                Number(value) || 0,
+                0
+            );
+
+    }
+
+    update();
+
+    programmerSauvegarde();
+
+}
+
+
+function updateOtherExpensesBudgetSummary() {
+
+    const spent =
+        total("autresDepenses");
+
+    const budget =
+        getOtherExpensesBudget();
+
+    const spentElement =
+        document.getElementById(
+            "other-expenses-spent"
+        );
+
+    const remainingElement =
+        document.getElementById(
+            "other-expenses-remaining"
+        );
+
+    const warningElement =
+        document.getElementById(
+            "other-expenses-warning"
+        );
+
+    if (
+        !spentElement ||
+        !remainingElement ||
+        !warningElement
+    ) {
+        return;
+    }
+
+    spentElement.textContent =
+        euro(spent);
+
+    if (budget === null) {
+
+        remainingElement.innerHTML =
+            `Reste : <strong>—</strong>`;
+
+        remainingElement.classList.remove(
+            "over"
+        );
+
+        warningElement.textContent = "";
+
+        return;
+
+    }
+
+    const remaining =
+        budget - spent;
+
+    remainingElement.innerHTML =
+        `Reste : <strong>${euro(remaining)}</strong>`;
+
+    if (remaining < 0) {
+
+        remainingElement.classList.add(
+            "over"
+        );
+
+        warningElement.textContent =
+            `⚠️ Budget dépassé de ${euro(
+                Math.abs(remaining)
+            )}`;
+
+    }
+    else {
+
+        remainingElement.classList.remove(
+            "over"
+        );
+
+        warningElement.textContent = "";
+
+    }
+
+}
+
+
+/* =========================================================
    AJOUT
 ========================================================= */
 
@@ -2357,7 +2624,7 @@ function updateChart() {
         total("abonnements");
 
     const autresDepenses =
-        total("autresDepenses");
+        getOtherExpensesReserved();
 
     const epargnes =
         total("epargnes");
@@ -2616,6 +2883,8 @@ function update() {
 
     updateConsumableBudgetSummary();
 
+    updateOtherExpensesBudgetSummary();
+
     updateConsumableRecap();
 
     updateOtherExpensesRecap();
@@ -2638,7 +2907,7 @@ function update() {
         total("charges") +
         total("abonnements") +
         projectedConsumables +
-        total("autresDepenses") +
+        getOtherExpensesReserved() +
         total("epargnes");
 
 
@@ -2887,6 +3156,8 @@ renderLines("charges");
 renderLines("abonnements");
 
 renderConsumables();
+
+renderOtherExpensesBudget();
 
 renderLines("autresDepenses");
 
